@@ -36,3 +36,7 @@ samples/output/
 .vscode/
 *.swp
 *~
+
+# Cloudflare Security Auditor Hardening
+*.pyc
+*.token
