@@ -11,9 +11,23 @@ on:
         description: 'Application Name'
         required: false
         default: 'ExampleApp'
+      target_device:
+        description: 'Target Device'
+        required: true
+        default: 'smartphone'
+        type: choice
+        options:
+          - smartphone
+          - tv
+      fullscreen:
+        description: 'Enable Immersive Fullscreen'
+        required: false
+        default: true
+        type: boolean
 
 jobs:
   package-apk:
+    name: Build APK (${{ github.event.inputs.target_device }})
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -23,12 +37,44 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+          cache: 'pip'
 
-      - name: Install Dependencies
+      - name: Set up Java OpenJDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install System Dependencies & Tools
+        run: |
+          sudo apt-get update && sudo apt-get install -y curl wget unzip
+          chmod +x ./setup_tools.sh
+          ./setup_tools.sh
+
+      - name: Install Python Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Test Agent Launch
+      - name: Execute Web2APK Packaging
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
-          python agent.py --help
+          mkdir -p ~/Web2APK_Output
+          FULLSCREEN_FLAG=""
+          if [ "${{ github.event.inputs.fullscreen }}" = "true" ]; then
+            FULLSCREEN_FLAG="--fullscreen"
+          fi
+          python agent.py \
+            --url "${{ github.event.inputs.url }}" \
+            --name "${{ github.event.inputs.app_name }}" \
+            --target "${{ github.event.inputs.target_device }}" \
+            $FULLSCREEN_FLAG \
+            --no-serve
+
+      - name: Upload Generated APKs
+        uses: actions/upload-artifact@v4
+        with:
+          name: web2apk-${{ github.event.inputs.target_device }}-${{ github.run_number }}
+          path: /home/runner/Web2APK_Output/
+          retention-days: 14

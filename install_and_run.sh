@@ -16,6 +16,9 @@ fi
 
 cd "$INSTALL_DIR"
 
+# Ensure tools
+./setup_tools.sh
+
 # Python virtual environment
 if [ ! -d ".venv" ]; then
     echo "Creating Python virtual environment..."
