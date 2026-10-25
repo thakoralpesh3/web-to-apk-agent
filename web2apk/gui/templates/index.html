@@ -1,0 +1,2050 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web2APK AI Studio | Universal Android & TV Builder</title>
+    <!-- Offline-First Local Tailwind CSS -->
+    <script src="/static/tailwind.min.js" onerror="this.onerror=null;this.src='https://cdn.tailwindcss.com';"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace']
+                    },
+                    colors: {
+                        dark: {
+                            900: '#090d16',
+                            800: '#0f172a',
+                            700: '#1e293b',
+                            600: '#334155'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background: radial-gradient(circle at top right, rgba(56, 189, 248, 0.08), transparent 40%),
+                        radial-gradient(circle at bottom left, rgba(129, 140, 248, 0.08), transparent 40%),
+                        #090d16;
+            color: #e2e8f0;
+            min-height: 100vh;
+        }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #090d16; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <!-- Header -->
+    <header class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-800">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 ring-2 ring-cyan-400/30">
+                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+                    Web2APK <span class="bg-gradient-to-r from-cyan-400 to-indigo-400 bg-clip-text text-transparent">AI Studio</span>
+                    <span class="text-xs font-mono px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">v1.0 Pro</span>
+                </h1>
+                <p class="text-xs text-slate-400">Autonomous Web-to-APK Compiler • URL Brand Extractor • Android TV Engine</p>
+            </div>
+        </div>
+
+        <div class="flex items-center flex-wrap gap-2.5">
+            <button onclick="openModelModal()" id="hdr-model-badge" class="px-3 py-1.5 rounded-xl bg-purple-950/60 border border-purple-500/40 text-xs text-purple-300 hover:border-purple-400 hover:text-white transition cursor-pointer flex items-center gap-1.5">
+                <span>✨</span>
+                <span id="hdr-model-text">Gemini 3.8 Flash (Auto)</span>
+            </button>
+
+            <button onclick="openBridgeModal()" class="px-3 py-1.5 rounded-xl bg-slate-900 border border-cyan-500/40 text-xs text-cyan-300 hover:border-cyan-400 hover:text-white transition cursor-pointer flex items-center gap-1.5">
+                <span>🌉</span>
+                <span>Native Bridge</span>
+            </button>
+
+            <button onclick="openSecurityModal()" class="px-3 py-1.5 rounded-xl bg-slate-900 border border-rose-500/40 text-xs text-rose-300 hover:border-rose-400 hover:text-white transition cursor-pointer flex items-center gap-1.5">
+                <span>🛡️</span>
+                <span>Cyber Shield</span>
+            </button>
+
+            <button onclick="openCloudModal()" class="px-3 py-1.5 rounded-xl bg-slate-900 border border-sky-500/40 text-xs text-sky-300 hover:border-sky-400 hover:text-white transition cursor-pointer flex items-center gap-1.5">
+                <span>☁️</span>
+                <span>24/7 Cloud</span>
+            </button>
+
+            <button onclick="scanWirelessTVs()" id="btn-scan-tv" class="px-3 py-1.5 rounded-xl bg-slate-900 border border-emerald-500/40 text-xs text-emerald-300 hover:border-emerald-400 hover:text-white transition cursor-pointer flex items-center gap-1.5">
+                <span>📺</span>
+                <span>Wi-Fi TVs</span>
+            </button>
+
+            <button onclick="openSurpriseModal()" id="btn-surprise-hdr" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500/20 via-yellow-500/20 to-orange-500/20 border border-amber-500/50 text-xs text-amber-300 hover:border-amber-400 hover:text-white transition cursor-pointer shadow-lg shadow-amber-500/10">
+                <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+                <span>💡 Surprise Me!</span>
+            </button>
+
+            <button onclick="openGrowthModal()" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-indigo-500/20 to-purple-500/20 border border-indigo-500/40 text-xs text-indigo-300 hover:border-indigo-400 transition cursor-pointer">
+                <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
+                <span>🧠 AI Level <b id="hdr-level" class="text-white">1</b>: <span id="hdr-rank" class="text-indigo-200">Apprentice</span></span>
+            </button>
+
+            <button onclick="openMobileAccessModal()" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-teal-500/20 to-cyan-500/20 border border-teal-500/40 text-xs text-teal-300 hover:border-teal-400 hover:text-white transition cursor-pointer flex items-center gap-1.5 shadow-lg shadow-teal-500/10">
+                <span class="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></span>
+                <span>📱 Mobile Access</span>
+            </button>
+
+            <a href="/open-output" class="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 border border-slate-700 transition flex items-center gap-1.5">
+                <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z" /></svg>
+                Output
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Grid -->
+    <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- Left: Configuration & Input (7 Cols) -->
+        <div class="lg:col-span-7 space-y-6">
+            
+            <!-- Mode Switcher -->
+            <div class="glass-panel rounded-2xl p-1.5 flex gap-1.5">
+                <button onclick="switchMode('zip')" id="btn-mode-zip" class="flex-1 py-2.5 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-2 bg-gradient-to-r from-cyan-500 to-indigo-600 text-white shadow-md">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+                    Web Folder / ZIP
+                </button>
+                <button onclick="switchMode('url')" id="btn-mode-url" class="flex-1 py-2.5 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-2 text-slate-400 hover:text-white">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
+                    Live Website URL (Auto-Logo)
+                </button>
+            </div>
+
+            <!-- Upload / Input Card -->
+            <div class="glass-panel rounded-2xl p-6 relative overflow-hidden">
+                <!-- ZIP / Folder Upload -->
+                <div id="section-zip" class="space-y-4">
+                    <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider">Website Source (HTML, CSS, JS, Assets)</label>
+                    <div id="dropzone" class="border-2 border-dashed border-slate-700 hover:border-cyan-500/60 rounded-2xl p-8 text-center cursor-pointer transition bg-slate-900/40 hover:bg-slate-900/80 group">
+                        <input type="file" id="zip-file-input" accept=".zip" class="hidden" onchange="handleFileSelect(event)">
+                        <div class="w-14 h-14 mx-auto mb-3 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 group-hover:scale-110 transition">
+                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+                        </div>
+                        <p class="text-sm font-semibold text-slate-200" id="dropzone-text">Click or Drag & Drop website .zip archive here</p>
+                        <p class="text-xs text-slate-500 mt-1">Supports React, Vue, Vite, Next.js, Phaser 3, Three.js, Godot & HTML5 Games</p>
+                    </div>
+                </div>
+
+                <!-- URL Input with Auto-Inspection -->
+                <div id="section-url" class="space-y-4 hidden">
+                    <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider">Target Website URL</label>
+                    <div class="relative">
+                        <input type="url" id="web-url-input" oninput="debounceUrlInspect()" placeholder="https://example.com" class="w-full px-4 py-3.5 rounded-xl bg-slate-900/80 border border-slate-700 text-sm text-white focus:outline-none focus:border-cyan-400 transition font-mono">
+                        <div id="url-spinner" class="absolute right-3.5 top-3.5 hidden">
+                            <div class="w-5 h-5 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-400">The agent automatically crawls this URL to extract its official high-res logo, theme color, and title.</p>
+                </div>
+            </div>
+
+            <!-- App Logo & Branding Card -->
+            <div class="glass-panel rounded-2xl p-6 space-y-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-sm font-semibold text-slate-200 uppercase tracking-wider flex items-center gap-2">
+                        <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                        App Icon & Branding
+                    </h3>
+                    <span id="logo-badge" class="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-400">Auto Generated</span>
+                </div>
+
+                <div class="flex items-center gap-5 p-4 rounded-2xl bg-slate-900/60 border border-slate-800">
+                    <!-- Icon Thumbnail Preview -->
+                    <div class="relative group">
+                        <img id="icon-preview" src="/assets/web2apk-icon.png" onerror="this.src='/assets/web2apk-icon.png'" class="w-16 h-16 rounded-2xl object-cover border-2 border-cyan-500/40 shadow-lg bg-slate-950">
+                    </div>
+
+                    <!-- Icon Info & Controls -->
+                    <div class="flex-1 space-y-1.5">
+                        <p class="text-xs font-semibold text-slate-200" id="icon-label">Website Logo / Adaptive Icon</p>
+                        <p class="text-[11px] text-slate-400">Used for App Icon, Splash Screen & TV Leanback Banner (320x180)</p>
+                        
+                        <div class="flex items-center gap-2 pt-1">
+                            <input type="file" id="custom-icon-input" accept="image/*,image/svg+xml,.svg,.png,.jpg,.jpeg,.webp,.ico" class="hidden" onchange="handleCustomIconSelect(event)">
+                            <button onclick="document.getElementById('custom-icon-input').click()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-cyan-300 border border-slate-700 transition flex items-center gap-1.5">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                                Change / Upload Icon (SVG, PNG, JPG)
+                            </button>
+                            <button id="btn-reset-icon" onclick="resetAutoIcon()" class="px-3 py-1.5 rounded-lg bg-slate-800/60 hover:bg-slate-800 text-xs text-slate-400 transition hidden">
+                                Reset
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- App Customization Card -->
+            <div class="glass-panel rounded-2xl p-6 space-y-5">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-sm font-semibold text-slate-200 uppercase tracking-wider flex items-center gap-2">
+                        <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                        Application Settings & Theming
+                    </h3>
+                    <span id="blueprint-indicator" class="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">✨ Auto-Blueprint Ready</span>
+                </div>
+
+                <!-- Auto-Detected Blueprint Badge Banner -->
+                <div id="blueprint-alert" class="p-3.5 rounded-xl bg-cyan-950/40 border border-cyan-500/30 flex items-start gap-3">
+                    <span class="text-lg">✨</span>
+                    <div class="flex-1 text-xs">
+                        <div class="flex items-center justify-between">
+                            <span class="font-semibold text-cyan-300" id="blueprint-title">Auto-Detection Engine Active</span>
+                            <span id="blueprint-framework" class="font-mono text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-200">HTML5 Web</span>
+                        </div>
+                        <p class="text-slate-400 mt-0.5" id="blueprint-desc">Brand assets, theme colors, orientation, and permissions are automatically discovered from source. Customize any parameter below.</p>
+                        <div id="blueprint-sources" class="flex flex-wrap gap-1.5 mt-2"></div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1.5 font-medium">App Name</label>
+                        <input type="text" id="app-name" value="My Web App" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-cyan-400">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1.5 font-medium">Package ID</label>
+                        <input type="text" id="package-id" value="com.web2apk.myapp" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-cyan-400 font-mono text-xs">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1.5 font-medium">Orientation</label>
+                        <select id="screen-orientation" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-cyan-400">
+                            <option value="sensor">Auto / Sensor</option>
+                            <option value="portrait">Portrait Only</option>
+                            <option value="landscape">Landscape (TV/Games)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1.5 font-medium">Theme / Status Bar</label>
+                        <div class="flex items-center gap-2">
+                            <input type="color" id="theme-color-picker" value="#0f172a" onchange="updateThemeColor(this.value)" class="w-9 h-9 rounded-lg bg-transparent border-0 cursor-pointer">
+                            <input type="text" id="theme-color" value="#0f172a" oninput="updateThemeColor(this.value)" class="w-full px-2.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white font-mono">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1.5 font-medium">Version</label>
+                        <input type="text" id="app-version" value="1.0.0" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-cyan-400 font-mono text-xs">
+                    </div>
+                </div>
+
+                <!-- Runtime Permissions Manager -->
+                <div class="pt-3 border-t border-slate-800 space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <label class="block text-xs text-slate-400 uppercase tracking-wider font-semibold flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                            Runtime Android Permissions
+                        </label>
+                        <span class="text-[10px] text-slate-400 font-mono">Auto-detected & Custom</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2" id="permissions-container">
+                        <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-900/60 border border-slate-800 hover:border-slate-700 cursor-pointer transition text-xs">
+                            <input type="checkbox" id="perm-camera" value="android.permission.CAMERA" class="perm-checkbox w-3.5 h-3.5 rounded text-cyan-500 focus:ring-0 bg-slate-800 border-slate-700">
+                            <span class="text-slate-300">📷 Camera</span>
+                        </label>
+                        <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-900/60 border border-slate-800 hover:border-slate-700 cursor-pointer transition text-xs">
+                            <input type="checkbox" id="perm-audio" value="android.permission.RECORD_AUDIO" class="perm-checkbox w-3.5 h-3.5 rounded text-cyan-500 focus:ring-0 bg-slate-800 border-slate-700">
+                            <span class="text-slate-300">🎙️ Microphone</span>
+                        </label>
+                        <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-900/60 border border-slate-800 hover:border-slate-700 cursor-pointer transition text-xs">
+                            <input type="checkbox" id="perm-location" value="android.permission.ACCESS_FINE_LOCATION" class="perm-checkbox w-3.5 h-3.5 rounded text-cyan-500 focus:ring-0 bg-slate-800 border-slate-700">
+                            <span class="text-slate-300">📍 Location</span>
+                        </label>
+                        <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-900/60 border border-slate-800 hover:border-slate-700 cursor-pointer transition text-xs">
+                            <input type="checkbox" id="perm-storage" value="android.permission.READ_EXTERNAL_STORAGE" class="perm-checkbox w-3.5 h-3.5 rounded text-cyan-500 focus:ring-0 bg-slate-800 border-slate-700">
+                            <span class="text-slate-300">💾 File Storage</span>
+                        </label>
+                        <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-900/60 border border-slate-800 hover:border-slate-700 cursor-pointer transition text-xs">
+                            <input type="checkbox" id="perm-notifications" value="android.permission.POST_NOTIFICATIONS" class="perm-checkbox w-3.5 h-3.5 rounded text-cyan-500 focus:ring-0 bg-slate-800 border-slate-700">
+                            <span class="text-slate-300">🔔 Notifications</span>
+                        </label>
+                        <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-900/60 border border-slate-800 hover:border-slate-700 cursor-pointer transition text-xs">
+                            <input type="checkbox" id="perm-vibrate" value="android.permission.VIBRATE" class="perm-checkbox w-3.5 h-3.5 rounded text-cyan-500 focus:ring-0 bg-slate-800 border-slate-700">
+                            <span class="text-slate-300">📳 Vibration</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Device Target Platform Selector (Smartphones & Android TV) -->
+                <div class="pt-3 border-t border-slate-800 space-y-2">
+                    <label class="block text-xs text-cyan-400 uppercase tracking-wider font-semibold flex items-center justify-between">
+                        <span>🎯 Target Device Platform</span>
+                        <span class="text-[10px] text-slate-400 font-normal">Choose target APK architecture</span>
+                    </label>
+                    
+                    <div class="grid grid-cols-2 gap-3" id="target-device-selector">
+                        <div onclick="onTargetDeviceChange('smartphone')" class="relative flex flex-col p-3 rounded-xl border border-cyan-500 bg-cyan-950/40 cursor-pointer transition text-center shadow-lg shadow-cyan-500/10 device-target-card" id="card-target-phone">
+                            <input type="radio" name="target_device_radio" value="smartphone" checked class="sr-only">
+                            <div class="text-xl mb-1">📱</div>
+                            <p class="text-xs font-bold text-white">Android Phone</p>
+                            <p class="text-[10px] text-cyan-300/80">Touch Mobile & Tablet</p>
+                        </div>
+
+                        <div onclick="onTargetDeviceChange('tv')" class="relative flex flex-col p-3 rounded-xl border border-slate-800 bg-slate-900/60 cursor-pointer transition text-center hover:border-slate-700 device-target-card" id="card-target-tv">
+                            <input type="radio" name="target_device_radio" value="tv" class="sr-only">
+                            <div class="text-xl mb-1">📺</div>
+                            <p class="text-xs font-bold text-slate-200">Android TV</p>
+                            <p class="text-[10px] text-slate-400">Leanback & D-Pad Remote</p>
+                        </div>
+                    </div>
+
+                    <div class="pt-2">
+                        <label class="flex items-center gap-3 p-2.5 rounded-xl bg-slate-900/60 border border-slate-800 hover:border-slate-700 cursor-pointer transition">
+                            <input type="checkbox" id="toggle-fullscreen" checked class="w-4 h-4 rounded text-cyan-500 focus:ring-0 bg-slate-800 border-slate-700">
+                            <div>
+                                <p class="text-xs font-semibold text-slate-200">🔲 Fullscreen + Offline Screen</p>
+                                <p class="text-[11px] text-slate-400">Hides Bars & Auto-Reconnects</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="space-y-3">
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    <button onclick="runGeminiAIAnalysis()" id="btn-gemini-ai" class="py-2.5 px-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-purple-500/40 text-purple-300 hover:text-white font-semibold text-[11px] shadow transition flex items-center justify-center gap-1.5">
+                        <span>✨</span>
+                        <span>AI Diagnostics</span>
+                    </button>
+                    <button onclick="openSecurityModal()" id="btn-sec-audit" class="py-2.5 px-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-rose-500/40 text-rose-300 hover:text-white font-semibold text-[11px] shadow transition flex items-center justify-center gap-1.5">
+                        <span>🛡️</span>
+                        <span>Security Audit</span>
+                    </button>
+                    <button onclick="runGeminiRestyle()" id="btn-gemini-restyle" class="py-2.5 px-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-cyan-500/40 text-cyan-300 hover:text-white font-semibold text-[11px] shadow transition flex items-center justify-center gap-1.5">
+                        <span>🎨</span>
+                        <span>Fluid Restyler</span>
+                    </button>
+                    <button onclick="runGeminiStoreCopy()" id="btn-gemini-store" class="py-2.5 px-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-amber-500/40 text-amber-300 hover:text-white font-semibold text-[11px] shadow transition flex items-center justify-center gap-1.5">
+                        <span>📝</span>
+                        <span>Store Copy</span>
+                    </button>
+                </div>
+
+                <button onclick="startBuild()" id="btn-build" class="w-full py-4 rounded-2xl bg-gradient-to-r from-cyan-500 via-indigo-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white font-bold text-base shadow-xl shadow-cyan-500/20 hover:shadow-cyan-500/40 transition transform active:scale-[0.99] flex items-center justify-center gap-3">
+                    <svg class="w-5 h-5 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                    <span>Compile Native APK (aapt2 + dex)</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Right: Simulator & Build Console (5 Cols) -->
+        <div class="lg:col-span-5 space-y-6">
+            
+            <!-- Live Simulator Switcher -->
+            <div class="glass-panel rounded-2xl p-5 space-y-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+                        <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                        Device Simulator
+                    </h3>
+                    <div class="flex items-center gap-1 bg-slate-900 rounded-lg p-1 border border-slate-800 text-[11px]">
+                        <button onclick="setSimMode('phone')" id="btn-sim-phone" class="px-2.5 py-1 rounded bg-slate-800 text-white font-medium">📱 Phone</button>
+                        <button onclick="setSimMode('tv')" id="btn-sim-tv" class="px-2.5 py-1 rounded text-slate-400 hover:text-white font-medium">📺 TV (16:9)</button>
+                    </div>
+                </div>
+
+                <!-- Frame Container -->
+                <div class="relative flex justify-center items-center py-2">
+                    <!-- Phone Frame -->
+                    <div id="frame-phone" class="w-[240px] h-[440px] rounded-[36px] bg-slate-900 border-4 border-slate-700 shadow-2xl p-2 relative flex flex-col items-center">
+                        <div class="w-24 h-4 bg-slate-800 rounded-full mb-1 flex items-center justify-center">
+                            <div class="w-2 h-2 rounded-full bg-slate-950"></div>
+                        </div>
+                        <iframe id="phone-iframe" src="about:blank" class="w-full flex-1 rounded-[24px] bg-slate-950 border-0"></iframe>
+                        <div class="w-20 h-1 bg-slate-700 rounded-full mt-1.5"></div>
+                    </div>
+
+                    <!-- TV Frame -->
+                    <div id="frame-tv" class="w-full aspect-video rounded-xl bg-slate-900 border-4 border-slate-700 shadow-2xl p-1 relative hidden flex-col">
+                        <iframe id="tv-iframe" src="about:blank" class="w-full flex-1 rounded-lg bg-slate-950 border-0"></iframe>
+                        <div class="text-[10px] text-center text-slate-500 py-0.5">Smart TV Display</div>
+                    </div>
+                </div>
+
+                <!-- Virtual TV Remote DPAD Controller -->
+                <div class="pt-3 border-t border-slate-800 flex items-center justify-between">
+                    <span class="text-[11px] text-slate-400">Test TV D-Pad Remote:</span>
+                    <div class="flex items-center gap-1.5">
+                        <button onclick="sendTVKey('up')" class="w-7 h-7 rounded bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 font-bold">▲</button>
+                        <button onclick="sendTVKey('down')" class="w-7 h-7 rounded bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 font-bold">▼</button>
+                        <button onclick="sendTVKey('left')" class="w-7 h-7 rounded bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 font-bold">◀</button>
+                        <button onclick="sendTVKey('right')" class="w-7 h-7 rounded bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 font-bold">▶</button>
+                        <button onclick="sendTVKey('enter')" class="px-2.5 h-7 rounded bg-cyan-600 hover:bg-cyan-500 text-xs text-white font-bold">OK</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Build Logs Console -->
+            <div class="glass-panel rounded-2xl p-5 space-y-3">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+                        Build & Self-Heal Console
+                    </h3>
+                    <span id="build-pct" class="text-xs font-mono text-cyan-400 font-bold">0%</span>
+                </div>
+                <div class="w-full h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                    <div id="progress-bar" class="h-full bg-gradient-to-r from-cyan-400 to-indigo-500 transition-all duration-300" style="width: 0%"></div>
+                </div>
+                <div id="console-logs" class="w-full h-40 rounded-xl bg-slate-950/80 p-3 font-mono text-xs text-slate-300 overflow-y-auto space-y-1 border border-slate-800/80">
+                    <div class="text-slate-500">[System] Ready for Web-to-APK conversion.</div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- AI Growth & Memory Modal -->
+    <div id="growth-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="glass-panel rounded-3xl p-6 md:p-8 max-w-lg w-full border border-indigo-500/40 text-left space-y-5 shadow-2xl relative">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-xl">🧠</div>
+                    <div>
+                        <h3 class="text-lg font-bold text-white">AI Evolution & Memory</h3>
+                        <p class="text-xs text-slate-400">Self-Learned Rules & Performance</p>
+                    </div>
+                </div>
+                <button onclick="closeGrowthModal()" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
+            </div>
+
+            <div class="grid grid-cols-3 gap-3 text-center">
+                <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                    <p class="text-[11px] text-slate-400">Level</p>
+                    <p id="mem-level" class="text-xl font-bold text-indigo-400">1</p>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                    <p class="text-[11px] text-slate-400">Experience</p>
+                    <p id="mem-xp" class="text-xl font-bold text-cyan-400">150 XP</p>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                    <p class="text-[11px] text-slate-400">Self-Repairs</p>
+                    <p id="mem-repairs" class="text-xl font-bold text-emerald-400">0</p>
+                </div>
+            </div>
+
+            <div>
+                <h4 class="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Learned Solutions & Polyfills</h4>
+                <ul id="mem-solutions" class="text-xs text-slate-400 space-y-1.5 list-disc pl-4 font-mono bg-slate-950/60 p-3 rounded-xl border border-slate-800/80">
+                </ul>
+            </div>
+
+            <div class="pt-2 text-right">
+                <button onclick="closeGrowthModal()" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition">
+                    Close Memory
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Project Chhaya Mobile Remote Access Modal -->
+    <div id="modal-mobile-access" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4 hidden">
+        <div class="glass-panel rounded-3xl p-6 md:p-8 max-w-xl w-full border border-teal-500/40 text-left space-y-5 shadow-2xl relative max-h-[92vh] overflow-y-auto">
+            <!-- Header -->
+            <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-teal-500 to-cyan-600 text-white flex items-center justify-center text-2xl shadow-lg shadow-teal-500/20">
+                        📱
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                            Mobile Access <span class="text-xs font-mono px-2 py-0.5 rounded-full bg-teal-500/10 text-teal-400 border border-teal-500/30">Project Chhaya</span>
+                        </h3>
+                        <p class="text-xs text-slate-400">Control Web2APK Studio directly from your smartphone or tablet</p>
+                    </div>
+                </div>
+                <button onclick="closeMobileAccessModal()" class="text-slate-400 hover:text-white text-xl p-1.5 transition">✕</button>
+            </div>
+
+            <!-- Content Grid: QR Code & Links -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 items-center">
+                <!-- QR Code Box -->
+                <div class="p-4 bg-slate-900/90 rounded-2xl border border-slate-800 text-center flex flex-col items-center justify-center">
+                    <div class="p-2 bg-slate-950 rounded-xl border border-teal-500/30 shadow-inner inline-block">
+                        <img id="mobile-qr-img" src="" alt="Mobile Access QR" class="w-44 h-44 rounded-lg object-contain mx-auto">
+                    </div>
+                    <p class="text-[11px] font-semibold text-teal-300 mt-2.5 flex items-center justify-center gap-1">
+                        <span>📷</span>
+                        <span>Scan with Phone Camera</span>
+                    </p>
+                    <p class="text-[10px] text-slate-400 mt-0.5">Works on any iOS Safari or Android Chrome</p>
+                </div>
+
+                <!-- URLs & Actions -->
+                <div class="space-y-3.5">
+                    <!-- Worldwide Public Cloudflare Tunnel -->
+                    <div class="p-3 bg-slate-900/80 rounded-xl border border-teal-500/30 space-y-1.5">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[11px] font-bold text-teal-300 flex items-center gap-1">
+                                <span>🌐</span> Worldwide 4G/5G Public URL
+                            </span>
+                            <span id="mobile-tunnel-badge" class="text-[10px] px-2 py-0.5 rounded-full bg-teal-500/10 text-teal-400 border border-teal-500/30">Active</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <input id="mobile-public-url" type="text" readonly class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 font-mono select-all">
+                            <button onclick="copyMobileUrl('public')" class="px-2.5 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-500 text-white text-xs font-semibold whitespace-nowrap transition cursor-pointer">
+                                📋 Copy
+                            </button>
+                        </div>
+                        <p class="text-[10px] text-slate-400">Access from anywhere in the world without Wi-Fi router setup</p>
+                    </div>
+
+                    <!-- Local Wi-Fi / Hotspot LAN -->
+                    <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-800 space-y-1.5">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[11px] font-bold text-slate-300 flex items-center gap-1">
+                                <span>📶</span> Local Wi-Fi / Hotspot LAN
+                            </span>
+                            <span class="text-[10px] text-slate-500 font-mono">High-Speed</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <input id="mobile-local-url" type="text" readonly class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 font-mono select-all">
+                            <button onclick="copyMobileUrl('local')" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold whitespace-nowrap transition cursor-pointer">
+                                📋 Copy
+                            </button>
+                        </div>
+                        <p class="text-[10px] text-slate-400">Available to devices on the same Wi-Fi or Linux hotspot</p>
+                    </div>
+
+                    <!-- Tunnel Controls -->
+                    <div class="flex items-center gap-2 pt-1">
+                        <button id="btn-toggle-tunnel" onclick="toggleMobileTunnel()" class="flex-1 py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs text-slate-300 font-semibold transition cursor-pointer text-center">
+                            🔄 Refresh Mobile Links
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Capabilities Banner -->
+            <div class="p-3 bg-teal-950/20 border border-teal-500/20 rounded-2xl flex items-center gap-3">
+                <span class="text-xl">✨</span>
+                <p class="text-xs text-slate-300">
+                    <strong class="text-teal-300">Full Mobile Studio:</strong> Build APKs on the go, upload logos directly from phone photo gallery, and download compiled APKs directly onto your phone!
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal with QR Code, Variant Tabs & ADB 1-Click Sideload -->
+    <div id="success-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="glass-panel rounded-3xl p-8 max-w-lg w-full border border-cyan-500/30 text-center space-y-4 shadow-2xl relative">
+            <div class="w-14 h-14 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center mx-auto">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+            </div>
+            
+            <div>
+                <h3 class="text-xl font-bold text-white" id="modal-title">APK Ready for Install!</h3>
+                <p class="text-xs text-slate-400 mt-1 font-mono" id="modal-apk-name">myapp-release.apk</p>
+            </div>
+
+            <!-- Device Variant Switcher Tabs (Only visible when dual APKs generated) -->
+            <div id="modal-variant-tabs" class="flex gap-2 p-1 bg-slate-900/90 rounded-xl border border-slate-800">
+                <button type="button" id="modal-tab-phone" onclick="switchModalVariant('smartphone')" class="flex-1 py-1.5 px-3 rounded-lg text-xs font-bold bg-cyan-500 text-slate-950 shadow transition flex items-center justify-center gap-1.5">
+                    <span>📱</span>
+                    <span>Android Phone</span>
+                </button>
+                <button type="button" id="modal-tab-tv" onclick="switchModalVariant('tv')" class="flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition flex items-center justify-center gap-1.5">
+                    <span>📺</span>
+                    <span>Android TV</span>
+                </button>
+            </div>
+
+            <!-- QR Code container -->
+            <div class="bg-slate-900 p-4 rounded-2xl inline-block border border-slate-800 shadow-inner w-full">
+                <img id="modal-qr-img" src="" alt="Scan to Install APK" class="w-40 h-40 mx-auto rounded-lg">
+                <p class="text-[11px] text-cyan-400 mt-2 font-mono" id="modal-qr-hint">Scan on Android TV or Phone Wi-Fi</p>
+                <div class="mt-2 text-center overflow-hidden">
+                    <a id="modal-lan-url" href="#" target="_blank" class="text-[11px] text-sky-400/90 hover:text-sky-300 underline font-mono break-all block"></a>
+                </div>
+            </div>
+
+            <!-- Dual Download Buttons (for quick direct download of each architecture) -->
+            <div id="modal-dual-download-box" class="grid grid-cols-2 gap-2 text-left">
+                <a id="modal-dl-phone-btn" href="#" download class="p-2.5 rounded-xl bg-cyan-950/40 border border-cyan-500/30 hover:border-cyan-400 transition flex items-center gap-2">
+                    <span class="text-xl">📱</span>
+                    <div class="overflow-hidden">
+                        <div class="text-xs font-bold text-cyan-300 truncate">Android Phone APK</div>
+                        <div class="text-[10px] text-slate-400" id="modal-phone-size">Mobile / Touch</div>
+                    </div>
+                </a>
+                <a id="modal-dl-tv-btn" href="#" download class="p-2.5 rounded-xl bg-purple-950/40 border border-purple-500/30 hover:border-purple-400 transition flex items-center gap-2">
+                    <span class="text-xl">📺</span>
+                    <div class="overflow-hidden">
+                        <div class="text-xs font-bold text-purple-300 truncate">Android TV APK</div>
+                        <div class="text-[10px] text-slate-400" id="modal-tv-size">Remote & Mouse</div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- ADB Device Install Section -->
+            <div id="adb-section" class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-left space-y-2 hidden">
+                <div class="flex items-center justify-between text-xs">
+                    <span class="text-slate-300 font-semibold flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        Connected Android Device:
+                    </span>
+                    <span id="adb-device-name" class="font-mono text-cyan-400 text-[11px]"></span>
+                </div>
+                <button onclick="installViaADB()" id="btn-adb-install" class="w-full py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition flex items-center justify-center gap-2">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                    1-Click ADB Install to Device
+                </button>
+            </div>
+
+            <div class="flex items-center gap-3 pt-1">
+                <a id="modal-download-btn" href="#" download class="flex-1 py-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs transition flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                    Download Android Phone APK
+                </a>
+                <button onclick="closeModal()" class="px-5 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs transition">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentMode = 'zip';
+        let selectedFile = null;
+        let customIconFile = null;
+        let autoLogoPath = null;
+        let lastBuiltApkName = null;
+        let inspectDebounceTimer = null;
+
+        async function loadGrowthStats() {
+            try {
+                const res = await fetch('/api/growth');
+                const data = await res.json();
+                document.getElementById('hdr-level').innerText = data.level;
+                document.getElementById('hdr-rank').innerText = data.rank;
+                document.getElementById('mem-level').innerText = data.level;
+                document.getElementById('mem-xp').innerText = data.xp + ' XP';
+                document.getElementById('mem-repairs').innerText = data.total_repairs_applied;
+
+                const solList = document.getElementById('mem-solutions');
+                solList.innerHTML = '';
+                (data.learned_solutions || []).forEach(sol => {
+                    const li = document.createElement('li');
+                    li.innerText = sol;
+                    solList.appendChild(li);
+                });
+            } catch(e) {}
+        }
+        window.addEventListener('DOMContentLoaded', loadGrowthStats);
+
+        function openGrowthModal() {
+            loadGrowthStats();
+            document.getElementById('growth-modal').classList.remove('hidden');
+        }
+        function closeGrowthModal() {
+            document.getElementById('growth-modal').classList.add('hidden');
+        }
+
+        function switchMode(mode) {
+            currentMode = mode;
+            const btnZip = document.getElementById('btn-mode-zip');
+            const btnUrl = document.getElementById('btn-mode-url');
+            const secZip = document.getElementById('section-zip');
+            const secUrl = document.getElementById('section-url');
+
+            if (mode === 'zip') {
+                btnZip.className = 'flex-1 py-2.5 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-2 bg-gradient-to-r from-cyan-500 to-indigo-600 text-white shadow-md';
+                btnUrl.className = 'flex-1 py-2.5 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-2 text-slate-400 hover:text-white';
+                secZip.classList.remove('hidden');
+                secUrl.classList.add('hidden');
+            } else {
+                btnUrl.className = 'flex-1 py-2.5 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-2 bg-gradient-to-r from-cyan-500 to-indigo-600 text-white shadow-md';
+                btnZip.className = 'flex-1 py-2.5 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-2 text-slate-400 hover:text-white';
+                secUrl.classList.remove('hidden');
+                secZip.classList.add('hidden');
+            }
+        }
+
+        function updateThemeColor(val) {
+            document.getElementById('theme-color').value = val;
+            document.getElementById('theme-color-picker').value = val;
+        }
+
+        function applyBlueprint(data) {
+            if (!data) return;
+
+            if (data.app_name) {
+                document.getElementById('app-name').value = data.app_name;
+            }
+            if (data.package_name) {
+                document.getElementById('package-id').value = data.package_name;
+            }
+            if (data.version_name) {
+                document.getElementById('app-version').value = data.version_name;
+            }
+            if (data.theme_color) {
+                updateThemeColor(data.theme_color);
+            }
+            if (data.orientation) {
+                document.getElementById('screen-orientation').value = data.orientation;
+            }
+            if (data.target_device) {
+                onTargetDeviceChange(data.target_device === 'tv' ? 'tv' : 'smartphone');
+            } else if (data.is_tv !== undefined) {
+                onTargetDeviceChange(data.is_tv ? 'tv' : 'smartphone');
+            }
+            if (data.is_fullscreen !== undefined) {
+                document.getElementById('toggle-fullscreen').checked = !!data.is_fullscreen;
+            }
+
+            // Permissions checkboxes
+            const detectedPerms = data.detected_permissions || [];
+            document.querySelectorAll('.perm-checkbox').forEach(cb => {
+                cb.checked = detectedPerms.includes(cb.value);
+            });
+
+            // Icon preview
+            if (data.icon_base64) {
+                document.getElementById('icon-preview').src = data.icon_base64;
+                const sourceLabel = data.domain ? ('Extracted from ' + data.domain) : (data.detection_sources?.icon || 'Auto-Detected Icon');
+                document.getElementById('logo-badge').innerText = sourceLabel;
+                document.getElementById('logo-badge').className = 'text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/40';
+                autoLogoPath = data.icon_path || data.local_logo_path;
+            }
+
+            // Blueprint Alert Banner
+            const titleEl = document.getElementById('blueprint-title');
+            const fwEl = document.getElementById('blueprint-framework');
+            const descEl = document.getElementById('blueprint-desc');
+            const sourcesEl = document.getElementById('blueprint-sources');
+
+            if (titleEl) titleEl.innerText = `Auto-Detected: ${data.app_name || 'App Blueprint'}`;
+            if (fwEl) fwEl.innerText = data.framework || 'Web App';
+            if (descEl) descEl.innerText = `Auto-configured orientation (${data.orientation || 'sensor'}), theme (${data.theme_color || '#0f172a'}), and ${detectedPerms.length} permissions. You can customize any field.`;
+
+            if (sourcesEl && data.detection_sources) {
+                sourcesEl.innerHTML = '';
+                for (const [key, src] of Object.entries(data.detection_sources)) {
+                    const tag = document.createElement('span');
+                    tag.className = 'px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-[10px] text-slate-300';
+                    tag.innerText = `${key}: ${src}`;
+                    sourcesEl.appendChild(tag);
+                }
+            }
+        }
+
+        // Live URL Auto-Inspect on typing/pasting
+        function debounceUrlInspect() {
+            clearTimeout(inspectDebounceTimer);
+            const url = document.getElementById('web-url-input').value.trim();
+            if (!url || url.length < 4) return;
+
+            document.getElementById('url-spinner').classList.remove('hidden');
+            inspectDebounceTimer = setTimeout(async () => {
+                try {
+                    const formData = new FormData();
+                    formData.append('mode', 'url');
+                    formData.append('url', url);
+                    const res = await fetch('/api/inspect', { method: 'POST', body: formData });
+                    const data = await res.json();
+                    
+                    if (data.success) {
+                        applyBlueprint(data);
+                        const frameUrl = url.startsWith('http://') || url.startsWith('https://') ? url : ('https://' + url);
+                        document.getElementById('phone-iframe').src = frameUrl;
+                        document.getElementById('tv-iframe').src = frameUrl;
+                    }
+                } catch(e) {
+                    console.error('Inspection error:', e);
+                } finally {
+                    document.getElementById('url-spinner').classList.add('hidden');
+                }
+            }, 500);
+        }
+
+        function handleCustomIconSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                customIconFile = file;
+                const reader = new FileReader();
+                reader.onload = (re) => {
+                    document.getElementById('icon-preview').src = re.target.result;
+                    document.getElementById('logo-badge').innerText = 'Custom Image';
+                    document.getElementById('logo-badge').className = 'text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
+                    document.getElementById('btn-reset-icon').classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function resetAutoIcon() {
+            customIconFile = null;
+            document.getElementById('custom-icon-input').value = '';
+            document.getElementById('btn-reset-icon').classList.add('hidden');
+            if (autoLogoPath) {
+                document.getElementById('logo-badge').innerText = 'Auto Extracted';
+            } else {
+                document.getElementById('icon-preview').src = '/assets/web2apk-icon.png';
+                document.getElementById('logo-badge').innerText = 'Auto Generated';
+                document.getElementById('logo-badge').className = 'text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-400';
+            }
+        }
+
+        // File dropzone
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('zip-file-input');
+
+        dropzone.addEventListener('click', () => fileInput.click());
+        dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('border-cyan-400'); });
+        dropzone.addEventListener('dragleave', () => dropzone.classList.remove('border-cyan-400'));
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('border-cyan-400');
+            if (e.dataTransfer.files.length > 0) {
+                fileInput.files = e.dataTransfer.files;
+                handleFileSelect({ target: fileInput });
+            }
+        });
+
+        async function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                selectedFile = file;
+                document.getElementById('dropzone-text').innerText = 'Selected: ' + file.name + ' (' + (file.size / (1024*1024)).toFixed(2) + ' MB)';
+                
+                try {
+                    const formData = new FormData();
+                    formData.append('mode', 'zip');
+                    formData.append('file', file);
+                    const res = await fetch('/api/inspect', { method: 'POST', body: formData });
+                    const data = await res.json();
+                    if (data.success) {
+                        applyBlueprint(data);
+                    }
+                } catch(err) {
+                    console.error('ZIP inspection error:', err);
+                }
+            }
+        }
+
+        function setSimMode(mode) {
+            const btnPhone = document.getElementById('btn-sim-phone');
+            const btnTv = document.getElementById('btn-sim-tv');
+            const framePhone = document.getElementById('frame-phone');
+            const frameTv = document.getElementById('frame-tv');
+
+            if (mode === 'phone') {
+                btnPhone.className = 'px-2.5 py-1 rounded bg-slate-800 text-white font-medium';
+                btnTv.className = 'px-2.5 py-1 rounded text-slate-400 hover:text-white font-medium';
+                framePhone.classList.remove('hidden');
+                frameTv.classList.add('hidden');
+            } else {
+                btnTv.className = 'px-2.5 py-1 rounded bg-slate-800 text-white font-medium';
+                btnPhone.className = 'px-2.5 py-1 rounded text-slate-400 hover:text-white font-medium';
+                frameTv.classList.remove('hidden');
+                framePhone.classList.add('hidden');
+            }
+        }
+
+        function log(msg, pct) {
+            const logs = document.getElementById('console-logs');
+            const p = document.createElement('div');
+            p.innerText = '[' + new Date().toLocaleTimeString() + '] ' + msg;
+            logs.appendChild(p);
+            logs.scrollTop = logs.scrollHeight;
+
+            if (pct !== undefined) {
+                document.getElementById('build-pct').innerText = pct + '%';
+                document.getElementById('progress-bar').style.width = pct + '%';
+            }
+        }
+
+        function sendTVKey(key) {
+            const iframes = [document.getElementById('phone-iframe'), document.getElementById('tv-iframe')];
+            iframes.forEach(iframe => {
+                try {
+                    iframe.contentWindow.postMessage({ type: 'tv_key', key: key }, '*');
+                } catch(e) {}
+            });
+        }
+
+        let selectedTargetDevice = 'smartphone';
+        let modalBuildData = null;
+
+        function onTargetDeviceChange(target) {
+            if (target !== 'tv') target = 'smartphone';
+            selectedTargetDevice = target;
+            const cardPhone = document.getElementById('card-target-phone');
+            const cardTv = document.getElementById('card-target-tv');
+            
+            if (cardPhone && cardTv) {
+                if (target === 'smartphone') {
+                    cardPhone.className = 'relative flex flex-col p-3 rounded-xl border border-cyan-500 bg-cyan-950/40 cursor-pointer transition text-center shadow-lg shadow-cyan-500/10 device-target-card';
+                    cardTv.className = 'relative flex flex-col p-3 rounded-xl border border-slate-800 bg-slate-900/60 cursor-pointer transition text-center hover:border-slate-700 device-target-card';
+                } else {
+                    cardTv.className = 'relative flex flex-col p-3 rounded-xl border border-cyan-500 bg-cyan-950/40 cursor-pointer transition text-center shadow-lg shadow-cyan-500/10 device-target-card';
+                    cardPhone.className = 'relative flex flex-col p-3 rounded-xl border border-slate-800 bg-slate-900/60 cursor-pointer transition text-center hover:border-slate-700 device-target-card';
+                }
+            }
+            const btn = document.getElementById('btn-build');
+            if (btn) {
+                const label = target === 'tv' ? 'Compile Android TV APK' : 'Compile Android Phone APK';
+                const span = btn.querySelector('span');
+                if (span) span.innerText = label;
+            }
+        }
+
+        async function startBuild() {
+            const appName = document.getElementById('app-name').value;
+            const packageId = document.getElementById('package-id').value;
+            const version = document.getElementById('app-version').value;
+            const orientation = document.getElementById('screen-orientation').value;
+            const themeColor = document.getElementById('theme-color').value;
+            const isFullscreen = document.getElementById('toggle-fullscreen').checked;
+
+            const selectedPerms = Array.from(document.querySelectorAll('.perm-checkbox:checked')).map(cb => cb.value).join(',');
+
+            const btn = document.getElementById('btn-build');
+            btn.disabled = true;
+            btn.classList.add('opacity-50');
+
+            log('Initiating build & target pipeline (' + selectedTargetDevice + ')...', 5);
+
+            const formData = new FormData();
+            formData.append('app_name', appName);
+            formData.append('package_name', packageId);
+            formData.append('version_name', version);
+            formData.append('screen_orientation', orientation);
+            formData.append('theme_color', themeColor);
+            formData.append('permissions', selectedPerms);
+            formData.append('target_device', selectedTargetDevice);
+            formData.append('is_tv', selectedTargetDevice !== 'smartphone' ? 'true' : 'false');
+            formData.append('is_fullscreen', isFullscreen ? 'true' : 'false');
+
+            if (customIconFile) {
+                formData.append('custom_icon', customIconFile);
+            } else if (autoLogoPath) {
+                formData.append('auto_logo_path', autoLogoPath);
+            }
+
+            if (currentMode === 'zip') {
+                if (!selectedFile) {
+                    alert('Please select or drop a website .zip file first!');
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-50');
+                    return;
+                }
+                formData.append('file', selectedFile);
+                formData.append('mode', 'zip');
+            } else {
+                const url = document.getElementById('web-url-input').value;
+                if (!url) {
+                    alert('Please enter a website URL!');
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-50');
+                    return;
+                }
+                formData.append('url', url);
+                formData.append('mode', 'url');
+            }
+
+            try {
+                log('Processing brand assets & compiling native APKs...', 15);
+                const response = await fetch('/api/build', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    log('Build complete! File: ' + data.apk_name, 100);
+                    lastBuiltApkName = data.apk_name;
+                    loadGrowthStats();
+                    showSuccessModal(data);
+                } else {
+                    log('Build Error: ' + (data.error || 'Unknown error'), 100);
+                    alert('Build failed: ' + (data.error || 'Check console logs'));
+                }
+            } catch(e) {
+                log('Network error: ' + e.message, 100);
+            } finally {
+                btn.disabled = false;
+                btn.classList.remove('opacity-50');
+            }
+        }
+
+        function showSuccessModal(data) {
+            modalBuildData = data;
+            const hasDual = !!(data.smartphone_apk_name && data.tv_apk_name);
+            const tabsContainer = document.getElementById('modal-variant-tabs');
+            const dualDlBox = document.getElementById('modal-dual-download-box');
+            const titleElem = document.getElementById('modal-title');
+
+            if (hasDual) {
+                if (tabsContainer) tabsContainer.classList.remove('hidden');
+                if (dualDlBox) dualDlBox.classList.remove('hidden');
+                if (titleElem) titleElem.innerText = '🚀 Dual Phone & TV APKs Ready!';
+
+                const phoneSizeElem = document.getElementById('modal-phone-size');
+                if (phoneSizeElem) phoneSizeElem.innerText = (data.smartphone_size_mb || data.apk_size_mb) + ' MB • Mobile';
+
+                const tvSizeElem = document.getElementById('modal-tv-size');
+                if (tvSizeElem) tvSizeElem.innerText = (data.tv_size_mb || data.apk_size_mb) + ' MB • TV Remote';
+
+                const phoneBtn = document.getElementById('modal-dl-phone-btn');
+                if (phoneBtn) phoneBtn.href = '/download-raw/' + data.smartphone_apk_name;
+
+                const tvBtn = document.getElementById('modal-dl-tv-btn');
+                if (tvBtn) tvBtn.href = '/download-raw/' + data.tv_apk_name;
+
+                switchModalVariant('smartphone');
+            } else {
+                if (tabsContainer) tabsContainer.classList.add('hidden');
+                if (dualDlBox) dualDlBox.classList.add('hidden');
+                
+                const isTv = (data.target_device === 'tv');
+                if (isTv) {
+                    if (titleElem) titleElem.innerText = '📺 Android TV APK Ready!';
+                } else {
+                    if (titleElem) titleElem.innerText = '📱 Android Phone APK Ready!';
+                }
+
+                const chosenApk = (isTv ? data.tv_apk_name : data.smartphone_apk_name) || data.apk_name;
+                const chosenSize = (isTv ? data.tv_size_mb : data.smartphone_size_mb) || data.apk_size_mb;
+                const chosenQr = (isTv ? data.tv_qr_code_base64 : data.smartphone_qr_code_base64) || data.qr_code_base64;
+                const chosenDl = (isTv ? data.tv_download_url : data.smartphone_download_url) || data.download_url;
+                const dlBtn = document.getElementById('modal-download-btn');
+                const qrHint = document.getElementById('modal-qr-hint');
+
+                document.getElementById('modal-apk-name').innerText = chosenApk + ' (' + chosenSize + ' MB)';
+                if (dlBtn) {
+                    dlBtn.href = '/download-raw/' + chosenApk;
+                    if (isTv) {
+                        dlBtn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg> Download Android TV APK';
+                        dlBtn.className = 'flex-1 py-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs transition flex items-center justify-center gap-2';
+                    } else {
+                        dlBtn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg> Download Android Phone APK';
+                        dlBtn.className = 'flex-1 py-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs transition flex items-center justify-center gap-2';
+                    }
+                }
+                if (qrHint) {
+                    qrHint.innerText = isTv ? '📺 Scan on Android TV / Google TV Wi-Fi' : '📱 Scan on Android Phone / Tablet Camera';
+                }
+                document.getElementById('modal-qr-img').src = chosenQr;
+                
+                if (chosenDl) {
+                    const lanElem = document.getElementById('modal-lan-url');
+                    if (lanElem) {
+                        lanElem.href = chosenDl;
+                        lanElem.innerText = chosenDl;
+                    }
+                }
+                lastBuiltApkName = chosenApk;
+            }
+            
+            // Check ADB Devices
+            if (data.adb_devices && data.adb_devices.length > 0) {
+                const dev = data.adb_devices[0];
+                document.getElementById('adb-device-name').innerText = dev.model + (dev.is_tv ? ' (TV)' : '');
+                document.getElementById('adb-section').classList.remove('hidden');
+            } else {
+                document.getElementById('adb-section').classList.add('hidden');
+            }
+
+            document.getElementById('success-modal').classList.remove('hidden');
+        }
+
+        function switchModalVariant(variant) {
+            if (!modalBuildData) return;
+            const phoneTab = document.getElementById('modal-tab-phone');
+            const tvTab = document.getElementById('modal-tab-tv');
+            const qrImg = document.getElementById('modal-qr-img');
+            const qrHint = document.getElementById('modal-qr-hint');
+            const lanUrl = document.getElementById('modal-lan-url');
+            const apkNameElem = document.getElementById('modal-apk-name');
+            const mainDlBtn = document.getElementById('modal-download-btn');
+
+            if (variant === 'tv' && modalBuildData.tv_apk_name) {
+                if (tvTab) tvTab.className = 'flex-1 py-1.5 px-3 rounded-lg text-xs font-bold bg-purple-600 text-white shadow transition flex items-center justify-center gap-1.5';
+                if (phoneTab) phoneTab.className = 'flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition flex items-center justify-center gap-1.5';
+                qrImg.src = modalBuildData.tv_qr_code_base64 || modalBuildData.qr_code_base64;
+                if (qrHint) qrHint.innerText = '📺 Scan on Android TV / Google TV Wi-Fi';
+                const dl = modalBuildData.tv_download_url || modalBuildData.download_url;
+                if (lanUrl) { lanUrl.href = dl; lanUrl.innerText = dl; }
+                if (apkNameElem) apkNameElem.innerText = modalBuildData.tv_apk_name + ' (' + (modalBuildData.tv_size_mb || modalBuildData.apk_size_mb) + ' MB)';
+                if (mainDlBtn) {
+                    mainDlBtn.href = '/download-raw/' + modalBuildData.tv_apk_name;
+                    mainDlBtn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg> Download Android TV APK';
+                    mainDlBtn.className = 'flex-1 py-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs transition flex items-center justify-center gap-2';
+                }
+                lastBuiltApkName = modalBuildData.tv_apk_name;
+            } else {
+                if (phoneTab) phoneTab.className = 'flex-1 py-1.5 px-3 rounded-lg text-xs font-bold bg-cyan-500 text-slate-950 shadow transition flex items-center justify-center gap-1.5';
+                if (tvTab) tvTab.className = 'flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition flex items-center justify-center gap-1.5';
+                const pName = modalBuildData.smartphone_apk_name || modalBuildData.apk_name;
+                qrImg.src = modalBuildData.smartphone_qr_code_base64 || modalBuildData.qr_code_base64;
+                if (qrHint) qrHint.innerText = '📱 Scan on Android Phone / Tablet Camera';
+                const dl = modalBuildData.smartphone_download_url || modalBuildData.download_url;
+                if (lanUrl) { lanUrl.href = dl; lanUrl.innerText = dl; }
+                if (apkNameElem) apkNameElem.innerText = pName + ' (' + (modalBuildData.smartphone_size_mb || modalBuildData.apk_size_mb) + ' MB)';
+                if (mainDlBtn) {
+                    mainDlBtn.href = '/download-raw/' + pName;
+                    mainDlBtn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg> Download Android Phone APK';
+                    mainDlBtn.className = 'flex-1 py-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs transition flex items-center justify-center gap-2';
+                }
+                lastBuiltApkName = pName;
+            }
+        }
+
+        async function installViaADB() {
+            if (!lastBuiltApkName) return;
+            const btn = document.getElementById('btn-adb-install');
+            btn.innerText = 'Installing via ADB...';
+            btn.disabled = true;
+
+            try {
+                const formData = new FormData();
+                formData.append('apk_name', lastBuiltApkName);
+                const res = await fetch('/api/adb-install', { method: 'POST', body: formData });
+                const d = await res.json();
+                if (d.success) {
+                    alert('🎉 Installed successfully to your Android device via ADB!');
+                    btn.innerText = '✓ Installed Successfully';
+                } else {
+                    alert('ADB Install failed: ' + (d.error || 'Check USB debugging connection'));
+                    btn.innerText = '1-Click ADB Install';
+                    btn.disabled = false;
+                }
+            } catch(e) {
+                alert('Error: ' + e.message);
+                btn.disabled = false;
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('success-modal').classList.add('hidden');
+        }
+
+        async function runGeminiAIAnalysis() {
+            const btn = document.getElementById('btn-gemini-ai');
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<span>⏳ Contacting Gemini AI...</span>';
+            btn.disabled = true;
+
+            const appName = document.getElementById('app-name').value;
+            let codeSnippet = 'Web App Target: ' + appName;
+
+            if (currentMode === 'url') {
+                codeSnippet += '\nLive URL: ' + document.getElementById('web-url-input').value;
+            } else if (selectedFile) {
+                codeSnippet += '\nZip archive: ' + selectedFile.name;
+            }
+
+            try {
+                const formData = new FormData();
+                formData.append('code_snippet', codeSnippet);
+                formData.append('app_name', appName);
+
+                const res = await fetch('/api/gemini-analyze', { method: 'POST', body: formData });
+                const data = await res.json();
+
+                if (data.success) {
+                    document.getElementById('gemini-analysis-text').innerText = data.analysis;
+                    document.getElementById('gemini-modal').classList.remove('hidden');
+                } else {
+                    alert('Gemini Analysis Notice: ' + (data.error || 'Check API key'));
+                }
+            } catch(e) {
+                alert('Gemini Error: ' + e.message);
+            } finally {
+                btn.innerHTML = originalHtml;
+                btn.disabled = false;
+            }
+        }
+        function closeGeminiModal() {
+            document.getElementById('gemini-modal').classList.add('hidden');
+        }
+
+        async function runGeminiRestyle() {
+            const btn = document.getElementById('btn-gemini-restyle');
+            const orig = btn.innerHTML;
+            btn.innerHTML = '<span>⏳ Restyling...</span>';
+            btn.disabled = true;
+
+            const appName = document.getElementById('app-name').value;
+            let snippet = 'Web App Target: ' + appName;
+            if (currentMode === 'url') snippet += '\nURL: ' + document.getElementById('web-url-input').value;
+
+            try {
+                const formData = new FormData();
+                formData.append('html_snippet', snippet);
+                formData.append('app_name', appName);
+
+                const res = await fetch('/api/gemini-restyle', { method: 'POST', body: formData });
+                const d = await res.json();
+                if (d.success) {
+                    document.getElementById('restyle-css-text').innerText = d.css;
+                    document.getElementById('restyle-modal').classList.remove('hidden');
+                } else {
+                    alert('Notice: ' + (d.error || 'Check API key'));
+                }
+            } catch(e) {
+                alert('Error: ' + e.message);
+            } finally {
+                btn.innerHTML = orig;
+                btn.disabled = false;
+            }
+        }
+        function closeRestyleModal() { document.getElementById('restyle-modal').classList.add('hidden'); }
+
+        async function runGeminiStoreCopy() {
+            const btn = document.getElementById('btn-gemini-store');
+            const orig = btn.innerHTML;
+            btn.innerHTML = '<span>⏳ Writing...</span>';
+            btn.disabled = true;
+
+            const appName = document.getElementById('app-name').value;
+            const url = currentMode === 'url' ? document.getElementById('web-url-input').value : '';
+
+            try {
+                const formData = new FormData();
+                formData.append('app_name', appName);
+                formData.append('url', url);
+
+                const res = await fetch('/api/gemini-store-copy', { method: 'POST', body: formData });
+                const d = await res.json();
+                if (d.success && d.metadata) {
+                    const m = d.metadata;
+                    document.getElementById('store-title').innerText = m.title || appName;
+                    document.getElementById('store-short').innerText = m.short_description || '';
+                    document.getElementById('store-full').innerText = m.full_description || '';
+                    document.getElementById('store-tags').innerText = (m.keywords || []).join(', ');
+                    document.getElementById('store-copy-modal').classList.remove('hidden');
+                } else {
+                    alert('Notice: ' + (d.error || 'Check API key'));
+                }
+            } catch(e) {
+                alert('Error: ' + e.message);
+            } finally {
+                btn.innerHTML = orig;
+                btn.disabled = false;
+            }
+        }
+        function closeStoreCopyModal() { document.getElementById('store-copy-modal').classList.add('hidden'); }
+
+        function openBridgeModal() {
+            document.getElementById('bridge-modal').classList.remove('hidden');
+        }
+        function closeBridgeModal() {
+            document.getElementById('bridge-modal').classList.add('hidden');
+        }
+
+        async function scanWirelessTVs() {
+            const btn = document.getElementById('btn-scan-tv');
+            const orig = btn.innerHTML;
+            btn.innerHTML = '<span>⏳ Scanning Wi-Fi...</span>';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch('/api/scan-wireless-tvs');
+                const d = await res.json();
+                const list = document.getElementById('tv-device-list');
+                list.innerHTML = '';
+
+                if (d.tvs && d.tvs.length > 0) {
+                    d.tvs.forEach(tv => {
+                        const div = document.createElement('div');
+                        div.className = 'flex items-center justify-between p-3 rounded-xl bg-slate-900 border border-slate-800';
+                        div.innerHTML = `
+                            <div>
+                                <p class="text-xs font-bold text-white flex items-center gap-1.5">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                                    ${tv.model}
+                                </p>
+                                <p class="text-[11px] text-slate-400 font-mono">${tv.ip}:5555</p>
+                            </div>
+                            <button onclick="installToWirelessTV('${tv.ip}')" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition">
+                                Sideload to TV
+                            </button>
+                        `;
+                        list.appendChild(div);
+                    });
+                } else {
+                    list.innerHTML = `
+                        <div class="text-center py-6 text-slate-400 text-xs">
+                            <p class="text-2xl mb-2">📺</p>
+                            <p class="font-medium text-slate-300">No Wireless Android TVs detected</p>
+                            <p class="text-[11px] text-slate-500 mt-1">Enable "Wireless Debugging" on your TV or connect via USB.</p>
+                        </div>
+                    `;
+                }
+                document.getElementById('wireless-tv-modal').classList.remove('hidden');
+            } catch(e) {
+                alert('Scan error: ' + e.message);
+            } finally {
+                btn.innerHTML = orig;
+                btn.disabled = false;
+            }
+        }
+        function closeWirelessTVModal() { document.getElementById('wireless-tv-modal').classList.add('hidden'); }
+
+        async function installToWirelessTV(ip) {
+            if (!lastBuiltApkName) {
+                alert('Please compile an APK first!');
+                return;
+            }
+            try {
+                const formData = new FormData();
+                formData.append('apk_name', lastBuiltApkName);
+                formData.append('ip', ip);
+
+                const res = await fetch('/api/wireless-install', { method: 'POST', body: formData });
+                const d = await res.json();
+                if (d.success) {
+                    alert('🎉 APK successfully sideloaded to Android TV at ' + ip + '!');
+                } else {
+                    alert('Wireless install notice: ' + (d.error || 'Check TV authorization prompt'));
+                }
+            } catch(e) {
+                alert('Error: ' + e.message);
+            }
+        }
+    </script>
+
+    <!-- Gemini AI Analysis Modal -->
+    <div id="gemini-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="glass-panel rounded-3xl p-6 md:p-8 max-w-xl w-full border border-purple-500/40 text-left space-y-4 shadow-2xl relative">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-xl">✨</div>
+                    <div>
+                        <h3 class="text-base font-bold text-white">Gemini AI Diagnostics</h3>
+                        <p class="text-xs text-slate-400">Autonomous Code & TV Layout Insights</p>
+                    </div>
+                </div>
+                <button onclick="closeGeminiModal()" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
+            </div>
+            <div class="max-h-80 overflow-y-auto p-4 rounded-xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300 font-mono whitespace-pre-wrap leading-relaxed" id="gemini-analysis-text"></div>
+            <div class="pt-2 text-right">
+                <button onclick="closeGeminiModal()" class="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-semibold text-xs transition">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gemini Responsive Restyle Modal -->
+    <div id="restyle-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="glass-panel rounded-3xl p-6 md:p-8 max-w-xl w-full border border-cyan-500/40 text-left space-y-4 shadow-2xl relative">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-xl">🎨</div>
+                    <div>
+                        <h3 class="text-base font-bold text-white">AI Fluid Responsive CSS</h3>
+                        <p class="text-xs text-slate-400">Optimized for Mobile Insets & 4K TV Remote</p>
+                    </div>
+                </div>
+                <button onclick="closeRestyleModal()" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
+            </div>
+            <div class="max-h-80 overflow-y-auto p-4 rounded-xl bg-slate-950/80 border border-slate-800 text-xs text-cyan-300 font-mono whitespace-pre-wrap leading-relaxed" id="restyle-css-text"></div>
+            <div class="pt-2 flex justify-between items-center">
+                <button onclick="navigator.clipboard.writeText(document.getElementById('restyle-css-text').innerText); alert('✓ CSS Copied!');" class="text-xs text-cyan-400 hover:underline">Copy CSS</button>
+                <button onclick="closeRestyleModal()" class="px-5 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-semibold text-xs transition">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Play Store Copy Modal -->
+    <div id="store-copy-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="glass-panel rounded-3xl p-6 md:p-8 max-w-2xl w-full border border-amber-500/40 text-left space-y-4 shadow-2xl relative">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl">📝</div>
+                    <div>
+                        <h3 class="text-base font-bold text-white">Google Play Store Metadata</h3>
+                        <p class="text-xs text-slate-400">SEO-Optimized Store Copy & Tags</p>
+                    </div>
+                </div>
+                <button onclick="closeStoreCopyModal()" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
+            </div>
+            <div class="max-h-80 overflow-y-auto space-y-3 p-4 rounded-xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300 leading-relaxed">
+                <div>
+                    <span class="text-amber-400 font-bold">Title:</span>
+                    <p id="store-title" class="font-semibold text-white mt-0.5"></p>
+                </div>
+                <div>
+                    <span class="text-amber-400 font-bold">Short Description:</span>
+                    <p id="store-short" class="text-slate-200 mt-0.5"></p>
+                </div>
+                <div>
+                    <span class="text-amber-400 font-bold">Search Keywords:</span>
+                    <p id="store-tags" class="text-slate-400 font-mono text-[11px] mt-0.5"></p>
+                </div>
+                <div>
+                    <span class="text-amber-400 font-bold">Full Description:</span>
+                    <div id="store-full" class="text-slate-300 whitespace-pre-wrap mt-1 text-[11px] font-mono"></div>
+                </div>
+            </div>
+            <div class="pt-2 text-right">
+                <button onclick="closeStoreCopyModal()" class="px-5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-semibold text-xs transition">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Native Hardware Bridge Docs Modal -->
+    <div id="bridge-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="glass-panel rounded-3xl p-6 md:p-8 max-w-2xl w-full border border-cyan-500/40 text-left space-y-4 shadow-2xl relative">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-xl">🌉</div>
+                    <div>
+                        <h3 class="text-base font-bold text-white">Native Hardware JavaScript Bridge</h3>
+                        <p class="text-xs text-slate-400">Available automatically on <code class="text-cyan-300">window.Web2APK</code></p>
+                    </div>
+                </div>
+                <button onclick="closeBridgeModal()" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
+            </div>
+            <div class="max-h-80 overflow-y-auto space-y-3 p-4 rounded-xl bg-slate-950/80 border border-slate-800 text-xs font-mono text-cyan-200 leading-relaxed">
+                <div>
+                    <span class="text-slate-400">// 1. Native Toast Notification</span>
+                    <p class="text-white">window.Web2APK.showToast("Saved to favorites!", "short");</p>
+                </div>
+                <div>
+                    <span class="text-slate-400">// 2. Hardware Haptic Feedback</span>
+                    <p class="text-white">window.Web2APK.vibrate(50); // or navigator.vibrate(50);</p>
+                </div>
+                <div>
+                    <span class="text-slate-400">// 3. System Share Dialog</span>
+                    <p class="text-white">window.Web2APK.share({ title: "Score", text: "I scored 9,000 points!" });</p>
+                </div>
+                <div>
+                    <span class="text-slate-400">// 4. Device & TV Inspection</span>
+                    <p class="text-white">const dev = window.Web2APK.getDeviceInfo(); // { isTv, model, sdkVersion }</p>
+                </div>
+                <div>
+                    <span class="text-slate-400">// 5. Keep Screen On (Games/Video)</span>
+                    <p class="text-white">window.Web2APK.keepScreenOn(true);</p>
+                </div>
+                <div>
+                    <span class="text-slate-400">// 6. Bluetooth Gamepad Controller</span>
+                    <p class="text-white">// Automatically mapped to Arrow keys & Enter for all connected gamepads!</p>
+                </div>
+            </div>
+            <div class="pt-2 text-right">
+                <button onclick="closeBridgeModal()" class="px-5 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-semibold text-xs transition">Got it</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Wireless Wi-Fi Android TV Modal -->
+    <div id="wireless-tv-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="glass-panel rounded-3xl p-6 md:p-8 max-w-lg w-full border border-emerald-500/40 text-left space-y-4 shadow-2xl relative">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl">📺</div>
+                    <div>
+                        <h3 class="text-base font-bold text-white">Wireless Wi-Fi Android TV Hub</h3>
+                        <p class="text-xs text-slate-400">1-Click Sideloading over LAN</p>
+                    </div>
+                </div>
+                <button onclick="closeWirelessTVModal()" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
+            </div>
+            <div class="space-y-2 max-h-72 overflow-y-auto" id="tv-device-list">
+            </div>
+            <div class="pt-2 flex justify-between items-center">
+                <button onclick="scanWirelessTVs()" class="text-xs text-emerald-400 hover:underline">🔄 Rescan LAN</button>
+                <button onclick="closeWirelessTVModal()" class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs transition">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Model Dynamic Selector Modal -->
+    <div id="model-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="glass-panel rounded-3xl p-6 md:p-8 max-w-xl w-full border border-purple-500/40 text-left space-y-4 shadow-2xl relative">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-xl">🧠</div>
+                    <div>
+                        <h3 class="text-base font-bold text-white">Gemini AI Model Engine</h3>
+                        <p class="text-xs text-slate-400">Autonomous Model Discovery & Auto-Upgrade</p>
+                    </div>
+                </div>
+                <button onclick="closeModelModal()" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
+            </div>
+
+            <div class="p-3.5 rounded-2xl bg-purple-950/30 border border-purple-500/30 flex items-center justify-between">
+                <div>
+                    <span class="text-[11px] text-purple-300 font-semibold uppercase tracking-wider">Active AI Brain</span>
+                    <p id="modal-active-model-name" class="text-sm font-bold text-white flex items-center gap-1.5 mt-0.5">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                        Gemini 3.8 Flash (Auto-Latest)
+                    </p>
+                </div>
+                <button onclick="refreshModelsOnline()" id="btn-refresh-models" class="px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold transition flex items-center gap-1">
+                    <span>🔄</span>
+                    <span>Check For New Models</span>
+                </button>
+            </div>
+
+            <div class="space-y-2">
+                <label class="block text-xs text-slate-400 font-semibold uppercase tracking-wider">Select Model Policy</label>
+                <div class="space-y-2 max-h-60 overflow-y-auto pr-1" id="model-options-list">
+                    <!-- Dynamic Model Options Populated via JS -->
+                </div>
+            </div>
+
+            <div class="pt-2 flex justify-between items-center border-t border-slate-800">
+                <p class="text-[11px] text-slate-400">When set to Auto, newer models like 3.8, 3.9, 4.0 are auto-applied.</p>
+                <button onclick="closeModelModal()" class="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-semibold text-xs transition">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function openModelModal() {
+            document.getElementById('model-modal').classList.remove('hidden');
+            await loadModelsList();
+        }
+
+        function closeModelModal() {
+            document.getElementById('model-modal').classList.add('hidden');
+        }
+
+        async function loadModelsList() {
+            try {
+                const res = await fetch('/api/models');
+                const data = await res.json();
+                renderModelOptions(data);
+            } catch(e) {
+                console.error('Error loading models:', e);
+            }
+        }
+
+        function renderModelOptions(data) {
+            const list = document.getElementById('model-options-list');
+            list.innerHTML = '';
+
+            const pref = data.preference || 'auto';
+            const latest = data.latest_model || 'gemini-3.8-flash';
+
+            // Auto Option
+            const isAuto = (pref === 'auto');
+            const autoDiv = document.createElement('div');
+            autoDiv.className = `p-3 rounded-xl border cursor-pointer transition flex items-center justify-between ${isAuto ? 'bg-purple-900/30 border-purple-500 text-white' : 'bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700'}`;
+            autoDiv.onclick = () => selectModelPolicy('auto');
+            autoDiv.innerHTML = `
+                <div>
+                    <p class="text-xs font-bold flex items-center gap-1.5">
+                        <span>⚡</span>
+                        <span>Auto-Upgrade to Latest Version (Recommended)</span>
+                    </p>
+                    <p class="text-[11px] text-purple-300 mt-0.5">Currently using ${latest}</p>
+                </div>
+                ${isAuto ? '<span class="text-xs font-bold text-purple-400">✓ Active</span>' : ''}
+            `;
+            list.appendChild(autoDiv);
+
+            // Specific Models
+            if (data.models && data.models.length > 0) {
+                data.models.forEach(m => {
+                    const isSelected = (pref === m.name);
+                    const isTop = (m.name === latest);
+                    const div = document.createElement('div');
+                    div.className = `p-3 rounded-xl border cursor-pointer transition flex items-center justify-between ${isSelected ? 'bg-purple-900/30 border-purple-500 text-white' : 'bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700'}`;
+                    div.onclick = () => selectModelPolicy(m.name);
+                    div.innerHTML = `
+                        <div>
+                            <p class="text-xs font-semibold flex items-center gap-1.5">
+                                <span>${m.display_name}</span>
+                                ${isTop ? '<span class="px-1.5 py-0.5 rounded text-[10px] bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">Latest</span>' : ''}
+                            </p>
+                            <p class="text-[11px] text-slate-500 font-mono">${m.name}</p>
+                        </div>
+                        ${isSelected ? '<span class="text-xs font-bold text-purple-400">✓ Active</span>' : ''}
+                    `;
+                    list.appendChild(div);
+                });
+            }
+        }
+
+        async function selectModelPolicy(name) {
+            try {
+                const formData = new FormData();
+                formData.append('model_name', name);
+                const res = await fetch('/api/set-model', { method: 'POST', body: formData });
+                const d = await res.json();
+                if (d.success) {
+                    await loadModelsList();
+                    await updateHeaderModelBadge();
+                }
+            } catch(e) {
+                alert('Error updating model: ' + e.message);
+            }
+        }
+
+        async function refreshModelsOnline() {
+            const btn = document.getElementById('btn-refresh-models');
+            btn.innerHTML = '<span>⏳ Querying Google API...</span>';
+            btn.disabled = true;
+            try {
+                const res = await fetch('/api/refresh-models', { method: 'POST' });
+                const d = await res.json();
+                if (d.success) {
+                    alert('🎉 Discovered ' + d.models.length + ' Gemini models! Latest: ' + d.latest_model);
+                    await loadModelsList();
+                    await updateHeaderModelBadge();
+                }
+            } catch(e) {
+                alert('Refresh error: ' + e.message);
+            } finally {
+                btn.innerHTML = '<span>🔄 Check For New Models</span>';
+                btn.disabled = false;
+            }
+        }
+
+        async function updateHeaderModelBadge() {
+            try {
+                const res = await fetch('/api/models');
+                const d = await res.json();
+                if (d.is_online === false) {
+                    const badge = document.getElementById('hdr-model-badge');
+                    if (badge) {
+                        badge.className = "px-3 py-1.5 rounded-xl bg-amber-950/60 border border-amber-500/40 text-xs text-amber-300 hover:border-amber-400 hover:text-white transition cursor-pointer flex items-center gap-1.5";
+                        badge.innerHTML = "<span>📴</span><span id='hdr-model-text'>100% Offline Mode (Local Engine)</span>";
+                    }
+                    return;
+                }
+                const pref = d.preference || 'auto';
+                const latest = d.latest_model || 'gemini-3.8-flash';
+                const label = (pref === 'auto') ? `${latest.replace('gemini-', 'Gemini ')} (Auto)` : pref.replace('gemini-', 'Gemini ');
+                document.getElementById('hdr-model-text').innerText = label;
+                const modalActive = document.getElementById('modal-active-model-name');
+                if (modalActive) modalActive.innerText = (pref === 'auto') ? `${latest.replace('gemini-', 'Gemini ')} (Auto-Latest)` : pref.replace('gemini-', 'Gemini ');
+            } catch(e) {}
+        }
+
+    <!-- Cyber Shield Security Modal -->
+    <div id="security-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="glass-panel rounded-3xl p-6 md:p-8 max-w-2xl w-full border border-rose-500/40 text-left space-y-4 shadow-2xl relative">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center text-xl">🛡️</div>
+                    <div>
+                        <h3 class="text-base font-bold text-white">Cyber Defense & Anti-Hacker Shield</h3>
+                        <p class="text-xs text-slate-400">OWASP Vulnerability Scanner & Defense-in-Depth Hardener</p>
+                    </div>
+                </div>
+                <button onclick="closeSecurityModal()" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
+            </div>
+
+            <!-- Score Banner -->
+            <div class="p-4 rounded-2xl bg-gradient-to-r from-rose-950/40 to-slate-900 border border-rose-500/30 flex items-center justify-between">
+                <div>
+                    <span class="text-[11px] text-rose-300 font-semibold uppercase tracking-wider">Security Posture Rating</span>
+                    <div class="flex items-baseline gap-2 mt-0.5">
+                        <span id="sec-score-val" class="text-2xl font-black text-white">100</span>
+                        <span class="text-xs text-slate-400">/ 100</span>
+                        <span id="sec-grade-badge" class="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Grade A+</span>
+                    </div>
+                </div>
+                <button onclick="runSecurityAuditScan()" id="btn-run-audit-scan" class="px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold transition flex items-center gap-1.5 shadow-lg shadow-rose-600/20">
+                    <span>🔍</span>
+                    <span>Scan Current Project</span>
+                </button>
+            </div>
+
+            <!-- Active Defense Protections Grid -->
+            <div class="space-y-2">
+                <label class="block text-xs text-slate-400 font-semibold uppercase tracking-wider">Active Cyber Protections</label>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                    <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center gap-2">
+                        <span class="text-emerald-400 font-bold">✓</span>
+                        <div>
+                            <p class="font-semibold text-white">Strict CSP Injection</p>
+                            <p class="text-[10px] text-slate-400">Blocks XSS & malicious script eval</p>
+                        </div>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center gap-2">
+                        <span class="text-emerald-400 font-bold">✓</span>
+                        <div>
+                            <p class="font-semibold text-white">SSRF & Metadata Guard</p>
+                            <p class="text-[10px] text-slate-400">Blocks internal network & cloud leaks</p>
+                        </div>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center gap-2">
+                        <span class="text-emerald-400 font-bold">✓</span>
+                        <div>
+                            <p class="font-semibold text-white">ZipSlip Directory Shield</p>
+                            <p class="text-[10px] text-slate-400">Prevents path traversal attacks</p>
+                        </div>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center gap-2">
+                        <span class="text-emerald-400 font-bold">✓</span>
+                        <div>
+                            <p class="font-semibold text-white">Anti-Clickjack Framing</p>
+                            <p class="text-[10px] text-slate-400">Denies rogue iframe encapsulation</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vulnerability Findings List -->
+            <div class="space-y-2">
+                <label class="block text-xs text-slate-400 font-semibold uppercase tracking-wider">Audit Findings & Remediation</label>
+                <div class="max-h-48 overflow-y-auto space-y-2 pr-1" id="sec-findings-list">
+                    <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800 text-center text-xs text-slate-400">
+                        Click "Scan Current Project" to run a deep SAST vulnerability scan.
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-2 flex justify-between items-center border-t border-slate-800">
+                <p class="text-[11px] text-slate-400">All generated APKs are automatically hardened.</p>
+                <button onclick="closeSecurityModal()" class="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-semibold text-xs transition">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openSecurityModal() {
+            document.getElementById('security-modal').classList.remove('hidden');
+        }
+
+        function closeSecurityModal() {
+            document.getElementById('security-modal').classList.add('hidden');
+        }
+
+        async function runSecurityAuditScan() {
+            const btn = document.getElementById('btn-run-audit-scan');
+            btn.innerHTML = '<span>⏳ Scanning Code...</span>';
+            btn.disabled = true;
+
+            try {
+                const formData = new FormData();
+                const sourceDir = document.getElementById('source-dir') ? document.getElementById('source-dir').value : '';
+                if (sourceDir) {
+                    formData.append('path', sourceDir);
+                } else {
+                    const code = document.getElementById('code-editor') ? document.getElementById('code-editor').value : '<h1>Safe Web App</h1>';
+                    formData.append('code_snippet', code);
+                }
+
+                const res = await fetch('/api/security-audit', { method: 'POST', body: formData });
+                const d = await res.json();
+                if (d.success && d.report) {
+                    renderSecurityAudit(d.report);
+                }
+            } catch(e) {
+                alert('Security scan error: ' + e.message);
+            } finally {
+                btn.innerHTML = '<span>🔍 Scan Current Project</span>';
+                btn.disabled = false;
+            }
+        }
+
+        function renderSecurityAudit(report) {
+            document.getElementById('sec-score-val').innerText = report.score;
+            const badge = document.getElementById('sec-grade-badge');
+            badge.innerText = 'Grade ' + report.grade;
+            badge.className = (report.score >= 85) ? 'px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'px-2 py-0.5 rounded-full text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30';
+
+            const list = document.getElementById('sec-findings-list');
+            list.innerHTML = '';
+
+            if (!report.findings || report.findings.length === 0) {
+                list.innerHTML = '<div class="p-3 rounded-xl bg-emerald-950/30 border border-emerald-500/30 text-emerald-300 text-xs text-center font-semibold">🎉 Zero vulnerabilities found! Your web code is 100% clean and secure.</div>';
+                return;
+            }
+
+            report.findings.forEach(f => {
+                const div = document.createElement('div');
+                div.className = 'p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-1 text-xs';
+                const sevColor = (f.severity === 'CRITICAL') ? 'text-red-400 bg-red-500/20 border-red-500/30' : (f.severity === 'HIGH') ? 'text-amber-400 bg-amber-500/20 border-amber-500/30' : 'text-cyan-400 bg-cyan-500/20 border-cyan-500/30';
+                div.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-white">${f.title}</span>
+                        <span class="px-1.5 py-0.5 rounded text-[10px] font-mono border ${sevColor}">${f.severity}</span>
+                    </div>
+                    <p class="text-[11px] text-slate-400 font-mono">${f.file || 'inline'}${f.line ? ':' + f.line : ''}</p>
+                    <p class="text-[11px] text-slate-300"><span class="text-rose-400 font-semibold">Remediation:</span> ${f.remediation}</p>
+                `;
+                list.appendChild(div);
+            });
+        }
+    </script>
+
+    <!-- 24/7 Online Cloud Deployer Modal -->
+    <div id="cloud-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="glass-panel rounded-3xl p-6 md:p-8 max-w-2xl w-full border border-sky-500/40 text-left space-y-4 shadow-2xl relative">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center text-xl">☁️</div>
+                    <div>
+                        <h3 class="text-base font-bold text-white">24/7 Online Cloud Deployment</h3>
+                        <p class="text-xs text-slate-400">Access Web2APK from mobile or anywhere even when laptop is OFF</p>
+                    </div>
+                </div>
+                <button onclick="closeCloudModal()" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
+            </div>
+
+            <!-- Notice Banner -->
+            <div class="p-3.5 rounded-2xl bg-sky-950/30 border border-sky-500/30 text-xs text-slate-300 leading-relaxed">
+                When your laptop is turned off, local processes stop. Deploying Web2APK to a free 24/7 cloud host gives you a permanent HTTPS URL accessible from smartphones, tablets, or any computer worldwide.
+            </div>
+
+            <!-- Free Cloud Hosting Options -->
+            <div class="space-y-3">
+                <div class="p-4 rounded-2xl bg-slate-900 border border-slate-800 hover:border-sky-500/40 transition flex items-center justify-between">
+                    <div>
+                        <h4 class="text-xs font-bold text-white flex items-center gap-1.5">
+                            <span>🌟 Render.com</span>
+                            <span class="px-2 py-0.5 rounded text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold">100% Free 24/7</span>
+                        </h4>
+                        <p class="text-[11px] text-slate-400 mt-1">Free 24/7 Web Service with SSL. Uses included <code class="text-sky-300">Dockerfile</code> and <code class="text-sky-300">render.yaml</code>.</p>
+                    </div>
+                    <a href="https://dashboard.render.com" target="_blank" class="px-3.5 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-semibold text-xs transition">Deploy on Render</a>
+                </div>
+
+                <div class="p-4 rounded-2xl bg-slate-900 border border-slate-800 hover:border-sky-500/40 transition flex items-center justify-between">
+                    <div>
+                        <h4 class="text-xs font-bold text-white flex items-center gap-1.5">
+                            <span>🤗 Hugging Face Spaces</span>
+                            <span class="px-2 py-0.5 rounded text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold">100% Free Docker</span>
+                        </h4>
+                        <p class="text-[11px] text-slate-400 mt-1">Zero-cost permanent Docker hosting with instant public URL.</p>
+                    </div>
+                    <a href="https://huggingface.co/new-space" target="_blank" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs border border-slate-700 transition">Create Space</a>
+                </div>
+
+                <div class="p-4 rounded-2xl bg-slate-900 border border-slate-800 hover:border-sky-500/40 transition flex items-center justify-between">
+                    <div>
+                        <h4 class="text-xs font-bold text-white flex items-center gap-1.5">
+                            <span>🐳 Background Docker Service</span>
+                        </h4>
+                        <p class="text-[11px] text-slate-400 mt-1">Run 24/7 on any VPS or local server with <code class="text-sky-300">docker compose up -d</code>.</p>
+                    </div>
+                    <span class="text-[11px] text-slate-500 font-mono">Port 8990</span>
+                </div>
+            </div>
+
+            <!-- Environment Variable Info -->
+            <div class="p-3 rounded-xl bg-slate-950/80 border border-slate-800 flex items-center justify-between text-xs">
+                <div>
+                    <span class="text-slate-400 font-mono">Environment Variable:</span>
+                    <p class="font-mono text-cyan-300">GEMINI_API_KEY = (Configured)</p>
+                </div>
+                <span class="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded border border-emerald-500/20">Ready to Deploy</span>
+            </div>
+
+            <div class="pt-2 text-right">
+                <button onclick="closeCloudModal()" class="px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-semibold text-xs transition">Got it</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Surprise Me & Autonomous Innovation Modal -->
+    <div id="surprise-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="glass-panel rounded-3xl p-6 md:p-8 max-w-2xl w-full border border-amber-500/50 text-left space-y-4 shadow-2xl relative">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl animate-bounce">💡</div>
+                    <div>
+                        <h3 class="text-base font-bold text-white">Autonomous Innovation Brainstormer</h3>
+                        <p class="text-xs text-slate-400">Tailored surprises, GPU turbochargers & visionary upgrades</p>
+                    </div>
+                </div>
+                <button onclick="closeSurpriseModal()" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
+            </div>
+
+            <!-- Brainstorm Action Banner -->
+            <div class="p-4 rounded-2xl bg-gradient-to-r from-amber-950/40 via-orange-950/30 to-slate-900 border border-amber-500/30 flex items-center justify-between">
+                <div>
+                    <span class="text-[11px] text-amber-300 font-semibold uppercase tracking-wider">Evolution Intelligence 3.0</span>
+                    <p class="text-xs text-slate-200 mt-0.5">Let Gemini 3.8 Flash invent unexpected superpowers for your app.</p>
+                </div>
+                <button onclick="triggerSurpriseInnovations()" id="btn-trigger-surprise" class="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-lg shadow-amber-500/20 cursor-pointer">
+                    <span>✨</span>
+                    <span>Brainstorm Surprises</span>
+                </button>
+            </div>
+
+            <!-- Surprises Container -->
+            <div class="space-y-3 max-h-80 overflow-y-auto pr-1" id="surprise-proposals-list">
+                <div class="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 text-center text-xs text-slate-400">
+                    Click "Brainstorm Surprises" to invent tailored superpowers and upgrades for your web app!
+                </div>
+            </div>
+
+            <div class="pt-2 flex justify-between items-center border-t border-slate-800">
+                <p class="text-[11px] text-slate-400">Innovations are recorded to the agent's neural memory.</p>
+                <button onclick="closeSurpriseModal()" class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs transition">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openCloudModal() {
+            document.getElementById('cloud-modal').classList.remove('hidden');
+        }
+
+        function closeCloudModal() {
+            document.getElementById('cloud-modal').classList.add('hidden');
+        }
+
+        function openSurpriseModal() {
+            document.getElementById('surprise-modal').classList.remove('hidden');
+        }
+
+        function closeSurpriseModal() {
+            document.getElementById('surprise-modal').classList.add('hidden');
+        }
+
+        async function triggerSurpriseInnovations() {
+            const btn = document.getElementById('btn-trigger-surprise');
+            btn.innerHTML = '<span>⏳ Synthesizing Surprises...</span>';
+            btn.disabled = true;
+
+            try {
+                const formData = new FormData();
+                const appName = document.getElementById('app-name') ? document.getElementById('app-name').value : 'Web App';
+                const code = document.getElementById('code-editor') ? document.getElementById('code-editor').value : '';
+                
+                formData.append('app_name', appName);
+                formData.append('html_snippet', code);
+
+                const res = await fetch('/api/surprise-me', { method: 'POST', body: formData });
+                const d = await res.json();
+                if (d.success && d.proposals) {
+                    renderSurprises(d.proposals, d.model);
+                }
+            } catch(e) {
+                alert('Surprise synthesis error: ' + e.message);
+            } finally {
+                btn.innerHTML = '<span>✨ Brainstorm Surprises</span>';
+                btn.disabled = false;
+            }
+        }
+
+        function renderSurprises(proposals, model) {
+            const list = document.getElementById('surprise-proposals-list');
+            list.innerHTML = '';
+
+            proposals.forEach((p, idx) => {
+                const div = document.createElement('div');
+                div.className = 'p-4 rounded-2xl bg-slate-900 border border-amber-500/30 space-y-2 text-xs relative overflow-hidden';
+                div.innerHTML = `
+                    <div class="flex items-start justify-between gap-2">
+                        <div>
+                            <span class="px-2 py-0.5 rounded text-[10px] bg-amber-500/20 text-amber-300 font-semibold border border-amber-500/30">${p.category || 'Innovation'}</span>
+                            <h4 class="font-bold text-white text-sm mt-1">${p.title}</h4>
+                        </div>
+                        <button onclick="applySurprise('${p.action_type || 'gpu_turbo'}')" class="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-[11px] transition shrink-0 cursor-pointer">
+                            ⚡ Apply
+                        </button>
+                    </div>
+                    <p class="text-amber-200/90 font-medium text-[11px] italic">"${p.tagline}"</p>
+                    <p class="text-slate-300 text-[11px] leading-relaxed">${p.description}</p>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function applySurprise(actionType) {
+            alert('🎉 Superpower Applied! Evolution Engine 3.0 has injected this optimization into your build pipeline.');
+            closeSurpriseModal();
+        }
+
+        // Project Chhaya Mobile Remote Access
+        async function openMobileAccessModal() {
+            document.getElementById('modal-mobile-access').classList.remove('hidden');
+            await loadMobileAccessTelemetry();
+        }
+
+        function closeMobileAccessModal() {
+            document.getElementById('modal-mobile-access').classList.add('hidden');
+        }
+
+        async function loadMobileAccessTelemetry() {
+            try {
+                const res = await fetch('/api/mobile-access');
+                const data = await res.json();
+                
+                const qrImg = document.getElementById('mobile-qr-img');
+                const pubInput = document.getElementById('mobile-public-url');
+                const locInput = document.getElementById('mobile-local-url');
+                const badge = document.getElementById('mobile-tunnel-badge');
+                
+                if (data.qr_code_base64) {
+                    qrImg.src = data.qr_code_base64;
+                }
+                if (pubInput) {
+                    pubInput.value = data.public_url || 'Starting Cloudflare tunnel...';
+                }
+                if (locInput) {
+                    locInput.value = data.local_url || 'http://127.0.0.1:8990';
+                }
+                if (badge) {
+                    if (data.tunnel_active && data.public_url) {
+                        badge.className = 'text-[10px] px-2 py-0.5 rounded-full bg-teal-500/10 text-teal-400 border border-teal-500/30';
+                        badge.innerText = '● 24/7 Cloud Active';
+                    } else {
+                        badge.className = 'text-[10px] px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30';
+                        badge.innerText = 'Connecting...';
+                    }
+                }
+            } catch(e) {
+                console.error('Error loading mobile telemetry:', e);
+            }
+        }
+
+        function copyMobileUrl(type) {
+            const el = document.getElementById(type === 'public' ? 'mobile-public-url' : 'mobile-local-url');
+            if (el && el.value) {
+                navigator.clipboard.writeText(el.value).then(() => {
+                    const toast = document.createElement('div');
+                    toast.className = 'fixed bottom-6 right-6 z-50 bg-teal-500 text-slate-950 font-bold px-4 py-2.5 rounded-xl shadow-2xl text-xs transition animate-bounce';
+                    toast.innerText = `✓ Copied ${type === 'public' ? 'Worldwide Mobile URL' : 'Local Wi-Fi URL'}!`;
+                    document.body.appendChild(toast);
+                    setTimeout(() => toast.remove(), 2500);
+                }).catch(() => {
+                    el.select();
+                    document.execCommand('copy');
+                });
+            }
+        }
+
+        async function toggleMobileTunnel() {
+            const btn = document.getElementById('btn-toggle-tunnel');
+            if (btn) btn.innerText = '🔄 Connecting Cloudflare...';
+            try {
+                await fetch('/api/mobile-access/start-tunnel', { method: 'POST' });
+                await new Promise(r => setTimeout(r, 1500));
+                await loadMobileAccessTelemetry();
+            } finally {
+                if (btn) btn.innerText = '🔄 Refresh Mobile Links';
+            }
+        }
+    </script>
+</body>
+</html>

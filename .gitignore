@@ -1,0 +1,38 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Environments & Virtual Envs
+.venv/
+venv/
+ENV/
+env/
+
+# Build Artefacts & Packaged Apps
+*.apk
+*.aab
+*.keystore
+*.jks
+web2apk/build/
+web2apk/dist/
+samples/output/
+.pytest_cache/
+
+# Sensitive Credentials & Private Keys
+.env
+.env.local
+*.pem
+*.key
+
+# Runtime Logs
+*.log
+*.pid
+
+# OS & Editor metadata
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*~
