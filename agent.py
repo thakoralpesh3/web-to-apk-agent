@@ -382,8 +382,26 @@ def main():
     parser.add_argument("--fullscreen", action="store_true", default=True, help="Enable immersive fullscreen")
     parser.add_argument("--icon", type=str, default=None, help="Path to custom application icon")
     parser.add_argument("--no-serve", dest="serve", action="store_false", default=True, help="Do not start Wi-Fi sideload server after build")
+    parser.add_argument("--sync-github", nargs="?", const="", metavar="COMMIT_MSG", help="Commit and push all changes to GitHub origin main")
+    parser.add_argument("--watch-sync", action="store_true", help="Start background automatic GitHub sync daemon")
 
     args = parser.parse_args()
+
+    if args.sync_github is not None:
+        print_banner()
+        console.print("\n[bold cyan]🚀 Syncing Web-to-APK Agent to GitHub...[/bold cyan]")
+        sync_script = Path(__file__).resolve().parent / "sync_to_github.sh"
+        msg = args.sync_github.strip()
+        cmd = [str(sync_script)] + ([msg] if msg else [])
+        subprocess.run(cmd)
+        return
+
+    if args.watch_sync:
+        print_banner()
+        console.print("\n[bold cyan]🔍 Starting Antigravity Auto-Sync Watcher Daemon...[/bold cyan]")
+        watcher_script = Path(__file__).resolve().parent / "scripts" / "auto_git_sync.py"
+        subprocess.run([sys.executable, str(watcher_script)])
+        return
 
     if args.inspect:
         print_banner()
