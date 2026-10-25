@@ -8,6 +8,7 @@ Includes Self-Healing Problem Solver, Evolutionary Learning Memory & Auto-Resume
 
 import sys
 import os
+import subprocess
 import argparse
 from pathlib import Path
 from rich.console import Console
