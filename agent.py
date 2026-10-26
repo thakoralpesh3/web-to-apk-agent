@@ -353,7 +353,7 @@ def main():
     parser = argparse.ArgumentParser(description="Web2APK AI Agent: Universal Web to Android APK Converter, Self-Healer & Auto-Resume")
     parser.add_argument("--gui", "--studio", action="store_true", help="Launch Web2APK Studio Web Dashboard")
     parser.add_argument("--mobile", "-m", action="store_true", help="Display Project Chhaya mobile access QR code and connection links")
-    parser.add_argument("--port", type=int, default=8990, help="Web Studio port (default: 8990)")
+    parser.add_argument("--port", type=int, default=int(os.environ.get("PORT", 8990)), help="Web Studio port (default: 8990)")
     parser.add_argument("--wizard", action="store_true", help="Run interactive terminal wizard")
     parser.add_argument("--watch", "--daemon", action="store_true", help="Start background dropzone watcher")
     parser.add_argument("--check-sdk", action="store_true", help="Check SDK & environment status")
