@@ -24,13 +24,20 @@ on:
         required: false
         default: true
         type: boolean
+      publish_release:
+        description: 'Publish APK directly to GitHub Releases'
+        required: false
+        default: true
+        type: boolean
+  repository_dispatch:
+    types: [package_apk]
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   package-apk:
-    name: Build APK (${{ github.event.inputs.target_device }})
+    name: Build APK (${{ github.event.inputs.target_device || github.event.client_payload.target_device || 'smartphone' }})
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -64,20 +71,42 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           mkdir -p ~/Web2APK_Output
+          URL="${{ github.event.inputs.url || github.event.client_payload.url || 'https://example.com' }}"
+          APP_NAME="${{ github.event.inputs.app_name || github.event.client_payload.app_name || 'ExampleApp' }}"
+          DEVICE="${{ github.event.inputs.target_device || github.event.client_payload.target_device || 'smartphone' }}"
           FULLSCREEN_FLAG=""
-          if [ "${{ github.event.inputs.fullscreen }}" = "true" ]; then
+          if [ "${{ github.event.inputs.fullscreen }}" = "true" ] || [ "${{ github.event.client_payload.fullscreen }}" = "true" ]; then
             FULLSCREEN_FLAG="--fullscreen"
           fi
           python agent.py \
-            --url "${{ github.event.inputs.url }}" \
-            --name "${{ github.event.inputs.app_name }}" \
-            --target "${{ github.event.inputs.target_device }}" \
+            --url "$URL" \
+            --name "$APP_NAME" \
+            --target "$DEVICE" \
             $FULLSCREEN_FLAG \
             --no-serve
 
       - name: Upload Generated APKs
         uses: actions/upload-artifact@v4
         with:
-          name: web2apk-${{ github.event.inputs.target_device }}-${{ github.run_number }}
+          name: web2apk-${{ github.event.inputs.target_device || 'smartphone' }}-${{ github.run_number }}
           path: /home/runner/Web2APK_Output/
-          retention-days: 14
+          retention-days: 30
+
+      - name: Publish to GitHub Releases
+        if: ${{ github.event.inputs.publish_release != false }}
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: "v${{ github.run_number }}-apk"
+          name: "Web2APK Build #${{ github.run_number }} (${{ github.event.inputs.app_name || 'App' }})"
+          body: |
+            ### 📱 Web2APK Cloud Build #${{ github.run_number }}
+            - **App Name**: `${{ github.event.inputs.app_name || 'App' }}`
+            - **Target URL**: `${{ github.event.inputs.url || 'https://example.com' }}`
+            - **Target Platform**: `${{ github.event.inputs.target_device || 'smartphone' }}`
+            
+            Download the signed APK directly from Assets below to install on your Android device or TV.
+          files: /home/runner/Web2APK_Output/*
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
