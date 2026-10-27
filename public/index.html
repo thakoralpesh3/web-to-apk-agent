@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web2APK Live Device Simulator • 24/7 Android & TV Cloud Studio</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: { 500: '#06b6d4', 600: '#0891b2', 700: '#0e7490' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 0.8; }
+    }
+    .glow-cyan {
+      box-shadow: 0 0 35px -5px rgba(6, 182, 212, 0.35);
+    }
+    .tv-bezel {
+      box-shadow: 0 25px 60px -15px rgba(0,0,0,0.9), 0 0 0 10px #1e293b, 0 0 0 12px #334155;
+    }
+    .phone-bezel {
+      box-shadow: 0 25px 60px -15px rgba(0,0,0,0.9), 0 0 0 8px #1e293b, 0 0 0 10px #334155;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans selection:bg-cyan-500 selection:text-black">
+
+  <!-- Top Navigation Header -->
+  <header class="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur-md sticky top-0 z-40 px-4 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 font-bold text-lg text-white">
+        🤖
+      </div>
+      <div>
+        <h1 class="text-sm font-bold tracking-tight text-white flex items-center gap-2">
+          Web2APK Simulator
+          <span class="inline-flex items-center gap-1 text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> 24/7 Cloud Live
+          </span>
+        </h1>
+        <p class="text-[11px] text-slate-400">Continuous Smartphone & Android TV Live Preview Engine</p>
+      </div>
+    </div>
+
+    <!-- URL Input & Controls -->
+    <div class="flex-1 max-w-2xl flex items-center gap-2">
+      <div class="relative flex-1">
+        <span class="absolute inset-y-0 left-3 flex items-center pointer-events-none text-slate-500 text-xs">🌐</span>
+        <input type="url" id="appUrl" value="https://news.ycombinator.com" placeholder="Enter any website URL (e.g. https://your-site.com)"
+               class="w-full bg-slate-950/80 border border-slate-700/80 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 rounded-xl pl-8 pr-24 py-2 text-xs text-white placeholder-slate-500 font-mono transition">
+        <button onclick="loadUrl()" class="absolute right-1 top-1 bottom-1 px-3 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg text-xs font-semibold transition cursor-pointer">
+          Load
+        </button>
+      </div>
+      <button onclick="reloadFrame()" title="Reload Frame" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs transition cursor-pointer">
+        🔄
+      </button>
+    </div>
+
+    <!-- Right Quick Actions -->
+    <div class="flex items-center gap-2">
+      <button onclick="openBuildModal()" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white text-xs font-bold shadow-lg shadow-cyan-500/25 transition flex items-center gap-1.5 cursor-pointer">
+        <span>🚀</span> Build Real APK
+      </button>
+      <a href="https://github.com/thakoralpesh3/web-to-apk-agent" target="_blank" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs transition" title="View GitHub Repository">
+        ⭐ GitHub
+      </a>
+    </div>
+  </header>
+
+  <!-- Simulator Main Stage -->
+  <main class="flex-1 p-4 lg:p-6 flex flex-col xl:flex-row gap-6 max-w-[1700px] w-full mx-auto items-start justify-center">
+
+    <!-- Left Stage: Interactive Device Frame -->
+    <div class="flex-1 w-full flex flex-col items-center justify-center">
+
+      <!-- Device Switch Bar -->
+      <div class="mb-4 bg-slate-900/90 border border-slate-800 rounded-2xl p-1.5 flex items-center gap-1.5 shadow-xl">
+        <button id="btnPhone" onclick="switchDevice('phone')" class="px-4 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-cyan-600 text-white shadow-md cursor-pointer">
+          📱 Smartphone
+        </button>
+        <button id="btnPhoneLandscape" onclick="switchDevice('phone-landscape')" class="px-4 py-1.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition flex items-center gap-1.5 cursor-pointer">
+          🔄 Phone (Landscape)
+        </button>
+        <button id="btnTV" onclick="switchDevice('tv')" class="px-4 py-1.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition flex items-center gap-1.5 cursor-pointer">
+          📺 Android TV (16:9 Cinema)
+        </button>
+      </div>
+
+      <!-- DEVICE CONTAINER -->
+      <div id="simulatorStage" class="relative transition-all duration-300 flex justify-center items-center">
+        
+        <!-- PHONE FRAME (Default) -->
+        <div id="devicePhone" class="phone-bezel w-[360px] h-[720px] rounded-[48px] bg-slate-900 border border-slate-700/60 relative overflow-hidden flex flex-col select-none transition-all duration-300">
+          
+          <!-- Punch-hole Camera -->
+          <div class="h-7 bg-slate-950 flex items-center justify-between px-6 z-20 text-[10px] text-slate-400 font-mono">
+            <span id="phoneClock">12:00</span>
+            <div class="w-3.5 h-3.5 rounded-full bg-slate-900 border border-slate-800 mx-auto"></div>
+            <div class="flex items-center gap-1 text-[11px]">
+              <span>5G</span>
+              <span>📶</span>
+              <span>🔋</span>
+            </div>
+          </div>
+
+          <!-- Web Frame Container -->
+          <div class="flex-1 w-full relative bg-slate-950 overflow-hidden">
+            <iframe id="phoneIframe" src="https://news.ycombinator.com" class="w-full h-full border-0 bg-slate-950" allow="autoplay; camera; microphone; geolocation; accelerometer; gyroscope"></iframe>
+          </div>
+
+          <!-- Android Gesture Navigation Bar -->
+          <div class="h-5 bg-slate-950 flex items-center justify-center z-20">
+            <div class="w-28 h-1 rounded-full bg-slate-600/80"></div>
+          </div>
+        </div>
+
+        <!-- TV FRAME (Hidden initially) -->
+        <div id="deviceTV" class="tv-bezel hidden w-[880px] h-[495px] max-w-[95vw] rounded-2xl bg-slate-900 border border-slate-700/60 relative overflow-hidden flex-col select-none transition-all duration-300">
+          
+          <!-- TV Header Status -->
+          <div class="h-6 bg-slate-950/90 border-b border-slate-800/80 px-4 flex items-center justify-between z-20 text-[11px] text-slate-400 font-mono">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+              <span class="font-bold text-slate-200">Android TV 16:9 • D-Pad Mode</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span id="tvClock">12:00 PM</span>
+              <span class="text-cyan-400 font-bold">HDMI 1</span>
+            </div>
+          </div>
+
+          <!-- TV Screen Viewport -->
+          <div id="tvScreenArea" class="flex-1 w-full relative bg-slate-950 overflow-hidden">
+            <iframe id="tvIframe" src="" class="w-full h-full border-0 bg-slate-950" allow="autoplay; camera; microphone; geolocation; accelerometer; gyroscope"></iframe>
+            
+            <!-- Virtual Mouse Cursor Overlay for Android TV -->
+            <div id="tvCursor" class="absolute pointer-events-none transition-transform duration-75 z-30" style="left: 440px; top: 247px;">
+              <svg class="w-6 h-6 filter drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]" viewBox="0 0 24 24" fill="none">
+                <path d="M4 3L11 21L14.5 13.5L22 10.5L4 3Z" fill="#06b6d4" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- TV Bezel Bottom Brand -->
+          <div class="h-4 bg-slate-950 flex items-center justify-center border-t border-slate-800/80">
+            <span class="text-[9px] uppercase tracking-widest text-slate-600 font-bold">BRAVIA 4K HDR</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- TV Stand -->
+      <div id="tvStand" class="hidden flex-col items-center">
+        <div class="w-24 h-4 bg-slate-800 border-x border-slate-700"></div>
+        <div class="w-48 h-2 rounded-full bg-slate-700 shadow-xl"></div>
+      </div>
+    </div>
+
+    <!-- Right Control Panel: Remote Controller & Presets -->
+    <div class="w-full xl:w-96 space-y-4">
+
+      <!-- Android TV Virtual D-Pad Remote -->
+      <div id="remotePanel" class="bg-slate-900/80 border border-slate-800 rounded-3xl p-5 shadow-2xl backdrop-blur-md">
+        <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+          <div class="flex items-center gap-2">
+            <span class="text-base">🎮</span>
+            <h3 class="text-xs font-bold text-white uppercase tracking-wider">Android TV D-Pad Remote</h3>
+          </div>
+          <span class="text-[10px] text-cyan-400 font-mono bg-cyan-950/60 px-2 py-0.5 rounded-full border border-cyan-800/60">IR / Bluetooth</span>
+        </div>
+
+        <!-- D-Pad Directional Controller -->
+        <div class="flex justify-center my-3">
+          <div class="w-44 h-44 rounded-full bg-slate-950 border-4 border-slate-800 relative shadow-inner p-1 flex items-center justify-center">
+            <!-- Up -->
+            <button onclick="sendKey('ArrowUp')" class="absolute top-2 w-12 h-10 rounded-t-xl bg-slate-800 hover:bg-slate-700 active:bg-cyan-600 text-slate-200 text-xs font-bold flex items-center justify-center transition cursor-pointer">
+              ▲
+            </button>
+            <!-- Left -->
+            <button onclick="sendKey('ArrowLeft')" class="absolute left-2 w-10 h-12 rounded-l-xl bg-slate-800 hover:bg-slate-700 active:bg-cyan-600 text-slate-200 text-xs font-bold flex items-center justify-center transition cursor-pointer">
+              ◀
+            </button>
+            <!-- Center OK -->
+            <button onclick="sendKey('Enter')" class="w-16 h-16 rounded-full bg-gradient-to-tr from-cyan-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 active:scale-95 text-white text-xs font-bold shadow-lg shadow-cyan-500/25 flex items-center justify-center transition cursor-pointer z-10">
+              OK
+            </button>
+            <!-- Right -->
+            <button onclick="sendKey('ArrowRight')" class="absolute right-2 w-10 h-12 rounded-r-xl bg-slate-800 hover:bg-slate-700 active:bg-cyan-600 text-slate-200 text-xs font-bold flex items-center justify-center transition cursor-pointer">
+              ▶
+            </button>
+            <!-- Down -->
+            <button onclick="sendKey('ArrowDown')" class="absolute bottom-2 w-12 h-10 rounded-b-xl bg-slate-800 hover:bg-slate-700 active:bg-cyan-600 text-slate-200 text-xs font-bold flex items-center justify-center transition cursor-pointer">
+              ▼
+            </button>
+          </div>
+        </div>
+
+        <!-- Remote Auxiliary Keys -->
+        <div class="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-slate-800/80">
+          <button onclick="sendKey('Escape')" class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold flex flex-col items-center gap-1 transition cursor-pointer">
+            <span>↩️</span>
+            <span class="text-[10px]">Back</span>
+          </button>
+          <button onclick="sendKey('Home')" class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold flex flex-col items-center gap-1 transition cursor-pointer">
+            <span>🏠</span>
+            <span class="text-[10px]">Home</span>
+          </button>
+          <button onclick="toggleMouseMode()" id="btnMouseMode" class="p-2.5 rounded-xl bg-cyan-950/80 border border-cyan-800/80 hover:bg-cyan-900 text-cyan-200 text-xs font-semibold flex flex-col items-center gap-1 transition cursor-pointer">
+            <span>🖱️</span>
+            <span class="text-[10px]" id="lblMouseMode">Mouse: ON</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Presets -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-5 shadow-xl backdrop-blur-md">
+        <h3 class="text-xs font-bold text-white uppercase tracking-wider mb-3 flex items-center gap-2">
+          <span>⚡</span> Quick Sample Web Apps
+        </h3>
+        <div class="grid grid-cols-2 gap-2 text-xs">
+          <button onclick="setSample('https://news.ycombinator.com')" class="p-2.5 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-left text-slate-300 font-medium transition cursor-pointer">
+            📰 Hacker News
+          </button>
+          <button onclick="setSample('https://en.m.wikipedia.org')" class="p-2.5 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-left text-slate-300 font-medium transition cursor-pointer">
+            📚 Wikipedia Mobile
+          </button>
+          <button onclick="setSample('https://2048game.com')" class="p-2.5 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-left text-slate-300 font-medium transition cursor-pointer">
+            🎮 2048 Game
+          </button>
+          <button onclick="setSample('https://excalidraw.com')" class="p-2.5 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-left text-slate-300 font-medium transition cursor-pointer">
+            🎨 Whiteboard App
+          </button>
+        </div>
+      </div>
+
+      <!-- 24/7 Cloud Status Card -->
+      <div class="bg-gradient-to-br from-slate-900 via-slate-900 to-cyan-950/40 border border-cyan-900/30 rounded-3xl p-5 shadow-xl">
+        <div class="flex items-center gap-2 mb-2 text-cyan-400 text-xs font-bold uppercase tracking-wider">
+          <span>☁️</span> 24/7 Cloud Operations
+        </div>
+        <p class="text-[11px] text-slate-400 leading-relaxed mb-3">
+          This simulator is hosted natively on GitHub Pages and runs 24/7 perpetually without requiring your laptop to be powered on.
+        </p>
+        <div class="text-[11px] font-mono text-slate-500 space-y-1">
+          <div>• Host: GitHub Pages (Global CDN)</div>
+          <div>• Status: Active 24/7</div>
+          <div>• Direct Actions: Triggered on GitHub</div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Build Modal -->
+  <div id="buildModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-700/80 rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+          <span>🚀</span> Build Real APK via GitHub Cloud
+        </h3>
+        <button onclick="closeBuildModal()" class="text-slate-400 hover:text-white text-lg">✕</button>
+      </div>
+
+      <p class="text-xs text-slate-300">
+        You can build a signed APK for <strong id="modalTargetUrl" class="text-cyan-400"></strong> directly inside GitHub Actions without your laptop:
+      </p>
+
+      <div class="space-y-3 pt-2">
+        <a id="linkActionsBuild" href="https://github.com/thakoralpesh3/web-to-apk-agent/actions/workflows/run-agent.yml" target="_blank"
+           class="w-full p-3.5 rounded-xl bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white font-bold text-xs flex items-center justify-between transition shadow-lg shadow-cyan-500/20">
+          <span>📱 Trigger Build in GitHub Actions</span>
+          <span>➔</span>
+        </a>
+
+        <a id="linkIssueBuild" href="https://github.com/thakoralpesh3/web-to-apk-agent/issues/new?title=%5BBuild%5D+My+App&body=url:+https://news.ycombinator.com" target="_blank"
+           class="w-full p-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs flex items-center justify-between border border-slate-700 transition">
+          <span>🤖 Trigger via 24/7 Issue Bot</span>
+          <span>➔</span>
+        </a>
+      </div>
+
+      <div class="text-[11px] text-slate-500 text-center pt-2">
+        Outputs signed APKs with D-Pad TV navigation and mobile compatibility.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentMode = 'phone';
+    let mouseMode = true;
+    let cursorX = 440;
+    let cursorY = 247;
+
+    function updateClocks() {
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      document.getElementById('phoneClock').textContent = timeStr;
+      document.getElementById('tvClock').textContent = timeStr;
+    }
+    setInterval(updateClocks, 1000);
+    updateClocks();
+
+    function loadUrl() {
+      let u = document.getElementById('appUrl').value.trim();
+      if (!u.startsWith('http://') && !u.startsWith('https://')) {
+        u = 'https://' + u;
+        document.getElementById('appUrl').value = u;
+      }
+      document.getElementById('phoneIframe').src = u;
+      document.getElementById('tvIframe').src = u;
+    }
+
+    function reloadFrame() {
+      loadUrl();
+    }
+
+    function setSample(url) {
+      document.getElementById('appUrl').value = url;
+      loadUrl();
+    }
+
+    function switchDevice(mode) {
+      currentMode = mode;
+      const phone = document.getElementById('devicePhone');
+      const tv = document.getElementById('deviceTV');
+      const stand = document.getElementById('tvStand');
+      const remote = document.getElementById('remotePanel');
+
+      const btnPhone = document.getElementById('btnPhone');
+      const btnPhoneLandscape = document.getElementById('btnPhoneLandscape');
+      const btnTV = document.getElementById('btnTV');
+
+      [btnPhone, btnPhoneLandscape, btnTV].forEach(b => {
+        b.className = 'px-4 py-1.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition flex items-center gap-1.5 cursor-pointer';
+      });
+
+      if (mode === 'phone') {
+        phone.classList.remove('hidden');
+        phone.style.width = '360px';
+        phone.style.height = '720px';
+        tv.classList.add('hidden');
+        stand.classList.add('hidden');
+        btnPhone.className = 'px-4 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-cyan-600 text-white shadow-md cursor-pointer';
+      } else if (mode === 'phone-landscape') {
+        phone.classList.remove('hidden');
+        phone.style.width = '720px';
+        phone.style.height = '360px';
+        tv.classList.add('hidden');
+        stand.classList.add('hidden');
+        btnPhoneLandscape.className = 'px-4 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-cyan-600 text-white shadow-md cursor-pointer';
+      } else if (mode === 'tv') {
+        phone.classList.add('hidden');
+        tv.classList.remove('hidden');
+        tv.classList.add('flex');
+        stand.classList.remove('hidden');
+        stand.classList.add('flex');
+        btnTV.className = 'px-4 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-cyan-600 text-white shadow-md cursor-pointer';
+        
+        // Ensure TV frame has current URL
+        if (!document.getElementById('tvIframe').src || document.getElementById('tvIframe').src === 'about:blank') {
+          document.getElementById('tvIframe').src = document.getElementById('appUrl').value.trim();
+        }
+      }
+    }
+
+    function sendKey(keyName) {
+      const targetIframe = (currentMode === 'tv') ? document.getElementById('tvIframe') : document.getElementById('phoneIframe');
+      
+      // Move cursor on TV if in mouse mode
+      if (currentMode === 'tv' && mouseMode) {
+        const step = 40;
+        if (keyName === 'ArrowUp') cursorY = Math.max(20, cursorY - step);
+        if (keyName === 'ArrowDown') cursorY = Math.min(460, cursorY + step);
+        if (keyName === 'ArrowLeft') cursorX = Math.max(20, cursorX - step);
+        if (keyName === 'ArrowRight') cursorX = Math.min(850, cursorX + step);
+        
+        const cursor = document.getElementById('tvCursor');
+        cursor.style.left = cursorX + 'px';
+        cursor.style.top = cursorY + 'px';
+      }
+
+      try {
+        targetIframe.contentWindow.postMessage({ type: 'keydown', key: keyName }, '*');
+      } catch (e) {}
+    }
+
+    function toggleMouseMode() {
+      mouseMode = !mouseMode;
+      const cursor = document.getElementById('tvCursor');
+      const lbl = document.getElementById('lblMouseMode');
+      const btn = document.getElementById('btnMouseMode');
+
+      if (mouseMode) {
+        cursor.classList.remove('hidden');
+        lbl.textContent = 'Mouse: ON';
+        btn.classList.add('bg-cyan-950/80', 'border-cyan-800/80', 'text-cyan-200');
+        btn.classList.remove('bg-slate-800', 'text-slate-300');
+      } else {
+        cursor.classList.add('hidden');
+        lbl.textContent = 'Mouse: OFF';
+        btn.classList.remove('bg-cyan-950/80', 'border-cyan-800/80', 'text-cyan-200');
+        btn.classList.add('bg-slate-800', 'text-slate-300');
+      }
+    }
+
+    function openBuildModal() {
+      const u = document.getElementById('appUrl').value.trim();
+      document.getElementById('modalTargetUrl').textContent = u;
+      document.getElementById('linkIssueBuild').href = `https://github.com/thakoralpesh3/web-to-apk-agent/issues/new?title=%5BBuild%5D+App&body=${encodeURIComponent(u)}`;
+      document.getElementById('buildModal').classList.remove('hidden');
+    }
+
+    function closeBuildModal() {
+      document.getElementById('buildModal').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>
