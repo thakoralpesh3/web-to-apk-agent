@@ -1,9 +1,16 @@
 # Web2APK AI Agent: Universal Web to Android APK Converter & Cloud Studio
 
 [![Web2APK CI](https://github.com/thakoralpesh3/web-to-apk-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/thakoralpesh3/web-to-apk-agent/actions/workflows/ci.yml)
+[![Live 24/7 Simulator](https://img.shields.io/badge/Live_Simulator-24%2F7_Online-brightgreen.svg)](https://thakoralpesh3.github.io/web-to-apk-agent/)
 [![24/7 Cloud Issue Bot](https://github.com/thakoralpesh3/web-to-apk-agent/actions/workflows/issue-build.yml/badge.svg)](https://github.com/thakoralpesh3/web-to-apk-agent/actions/workflows/issue-build.yml)
 
 Autonomous AI Agent that converts live websites, HTML5 apps, PWAs, or web folders into production-ready Android Phone and Android TV APKs. Includes Native Google AAPT2 compilation, R8 Dex Bytecode generation, Self-Healing problem solver, and 24/7 Cloud operation.
+
+---
+
+## 📱 24/7 Live Web-to-APK Device Simulator (Zero Local Setup)
+Preview websites, test touchscreen gesture navigation, and TV D-Pad remote controls 24/7 directly in your browser:
+👉 **[Launch 24/7 Web-to-APK Simulator](https://thakoralpesh3.github.io/web-to-apk-agent/)**
 
 ---
 
