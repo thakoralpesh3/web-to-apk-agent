@@ -192,6 +192,14 @@ class APKBuilder:
                 extra_permissions=permissions,
                 theme_color=theme_color
             )
+            # Electron desktop bundle integration (github.com/electron/electron)
+            try:
+                from web2apk.electron_exporter import ElectronExporter
+                desktop_export_dir = OUTPUT_DIR / f"{clean_package}_electron_desktop"
+                ElectronExporter.export(desktop_export_dir, app_name=app_name, entry_url_or_file="index.html", is_remote=bool(remote_url))
+                self.log("💻 Generated Electron Desktop cross-platform bundle (Linux/Win/macOS)", 57)
+            except Exception as e:
+                self.log(f"Notice: Electron desktop generation ({e})", 57)
 
             # Copy web assets to app/src/main/assets/
             target_assets = project_dir / "app" / "src" / "main" / "assets"
