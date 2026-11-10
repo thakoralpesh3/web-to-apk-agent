@@ -730,7 +730,7 @@ public class MainActivity extends Activity {{
                                 rawData = rawData.substring(commaIdx + 1);
                             }}
                         }}
-                        rawData = rawData.replaceAll("\\s+", "");
+                        rawData = rawData.replaceAll("\\\\s+", "");
                         byte[] fileBytes = Base64.decode(rawData, Base64.DEFAULT);
                         if (fileBytes == null || fileBytes.length == 0) return;
 
@@ -750,23 +750,23 @@ public class MainActivity extends Activity {{
 
                         String lowerName = safeName.toLowerCase();
                         if (isSqlite && !lowerName.endsWith(".sqlite") && !lowerName.endsWith(".db") && !lowerName.endsWith(".sqlite3")) {{
-                            safeName = safeName.replaceAll("\\.[^.]+$", "") + ".sqlite";
+                            safeName = safeName.replaceAll("\\\\.[^.]+$", "") + ".sqlite";
                         }} else if (isZip && !lowerName.endsWith(".zip")) {{
-                            safeName = safeName.replaceAll("\\.[^.]+$", "") + ".zip";
+                            safeName = safeName.replaceAll("\\\\.[^.]+$", "") + ".zip";
                         }} else if (isGzip && !lowerName.endsWith(".gz") && !lowerName.endsWith(".tar.gz")) {{
-                            safeName = safeName.replaceAll("\\.[^.]+$", "") + ".gz";
+                            safeName = safeName.replaceAll("\\\\.[^.]+$", "") + ".gz";
                         }} else if (lowerName.endsWith(".html") || lowerName.endsWith(".htm") || !lowerName.contains(".")) {{
                             try {{
                                 String snippet = new String(fileBytes, 0, Math.min(256, fileBytes.length), java.nio.charset.StandardCharsets.UTF_8).trim();
-                                if (snippet.startsWith("{{\") || snippet.startsWith("[")) {{
-                                    safeName = safeName.replaceAll("\\.[^.]+$", "") + ".json";
+                                if (snippet.startsWith("{{") || snippet.startsWith("[")) {{
+                                    safeName = safeName.replaceAll("\\\\.[^.]+$", "") + ".json";
                                 }} else if (snippet.toUpperCase().startsWith("CREATE ") || snippet.toUpperCase().startsWith("INSERT ") ||
                                            snippet.toUpperCase().startsWith("BEGIN ") || snippet.startsWith("--") || snippet.startsWith("/*")) {{
-                                    safeName = safeName.replaceAll("\\.[^.]+$", "") + ".sql";
+                                    safeName = safeName.replaceAll("\\\\.[^.]+$", "") + ".sql";
                                 }} else if (detectedMime.contains("csv") || snippet.contains(",")) {{
-                                    safeName = safeName.replaceAll("\\.[^.]+$", "") + ".csv";
+                                    safeName = safeName.replaceAll("\\\\.[^.]+$", "") + ".csv";
                                 }} else if (isSqlite) {{
-                                    safeName = safeName.replaceAll("\\.[^.]+$", "") + ".sqlite";
+                                    safeName = safeName.replaceAll("\\\\.[^.]+$", "") + ".sqlite";
                                 }}
                             }} catch (Exception ignored) {{}}
                         }}
@@ -892,7 +892,7 @@ public class MainActivity extends Activity {{
                             String cType = conn.getContentType();
                             String resolvedName = filename;
                             if ((resolvedName == null || resolvedName.isEmpty()) && disp != null) {{
-                                java.util.regex.Matcher m = java.util.regex.Pattern.compile("filename\\*?=['\"]?(?:UTF-8'')?([^;'\"]+)['\"]?", java.util.regex.Pattern.CASE_INSENSITIVE).matcher(disp);
+                                java.util.regex.Matcher m = java.util.regex.Pattern.compile("filename[*]?=['\\\"']?(?:UTF-8'')?([^;'\\\"']+)['\\\"']?", java.util.regex.Pattern.CASE_INSENSITIVE).matcher(disp);
                                 if (m.find()) resolvedName = m.group(1).trim();
                             }}
                             if (resolvedName == null || resolvedName.isEmpty()) {{
@@ -1482,7 +1482,7 @@ public class MainActivity extends Activity {{
                     }}
                     String fileName = null;
                     if (contentDisposition != null) {{
-                        java.util.regex.Matcher m = java.util.regex.Pattern.compile("filename\\*?=['\"]?(?:UTF-8'')?([^;'\"]+)['\"]?", java.util.regex.Pattern.CASE_INSENSITIVE).matcher(contentDisposition);
+                        java.util.regex.Matcher m = java.util.regex.Pattern.compile("filename[*]?=['\\\"']?(?:UTF-8'')?([^;'\\\"']+)['\\\"']?", java.util.regex.Pattern.CASE_INSENSITIVE).matcher(contentDisposition);
                         if (m.find()) {{
                             fileName = m.group(1).trim();
                         }}
@@ -1492,15 +1492,15 @@ public class MainActivity extends Activity {{
                     }}
                     String urlLower = url.toLowerCase();
                     if (fileName.endsWith(".html") || fileName.endsWith(".bin") || !fileName.contains(".")) {{
-                        if (urlLower.contains(".sqlite3")) fileName = fileName.replaceAll("\\.[^.]+$", "") + ".sqlite3";
-                        else if (urlLower.contains(".sqlite")) fileName = fileName.replaceAll("\\.[^.]+$", "") + ".sqlite";
-                        else if (urlLower.contains(".db3")) fileName = fileName.replaceAll("\\.[^.]+$", "") + ".db3";
-                        else if (urlLower.contains(".db")) fileName = fileName.replaceAll("\\.[^.]+$", "") + ".db";
-                        else if (urlLower.contains(".sql")) fileName = fileName.replaceAll("\\.[^.]+$", "") + ".sql";
-                        else if (urlLower.contains(".json")) fileName = fileName.replaceAll("\\.[^.]+$", "") + ".json";
-                        else if (urlLower.contains(".csv")) fileName = fileName.replaceAll("\\.[^.]+$", "") + ".csv";
-                        else if (urlLower.contains(".xlsx")) fileName = fileName.replaceAll("\\.[^.]+$", "") + ".xlsx";
-                        else if (urlLower.contains(".zip")) fileName = fileName.replaceAll("\\.[^.]+$", "") + ".zip";
+                        if (urlLower.contains(".sqlite3")) fileName = fileName.replaceAll("\\\\.[^.]+$", "") + ".sqlite3";
+                        else if (urlLower.contains(".sqlite")) fileName = fileName.replaceAll("\\\\.[^.]+$", "") + ".sqlite";
+                        else if (urlLower.contains(".db3")) fileName = fileName.replaceAll("\\\\.[^.]+$", "") + ".db3";
+                        else if (urlLower.contains(".db")) fileName = fileName.replaceAll("\\\\.[^.]+$", "") + ".db";
+                        else if (urlLower.contains(".sql")) fileName = fileName.replaceAll("\\\\.[^.]+$", "") + ".sql";
+                        else if (urlLower.contains(".json")) fileName = fileName.replaceAll("\\\\.[^.]+$", "") + ".json";
+                        else if (urlLower.contains(".csv")) fileName = fileName.replaceAll("\\\\.[^.]+$", "") + ".csv";
+                        else if (urlLower.contains(".xlsx")) fileName = fileName.replaceAll("\\\\.[^.]+$", "") + ".xlsx";
+                        else if (urlLower.contains(".zip")) fileName = fileName.replaceAll("\\\\.[^.]+$", "") + ".zip";
                     }}
                     DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
                     if (mimetype != null && !mimetype.isEmpty()) {{
@@ -1579,6 +1579,7 @@ public class MainActivity extends Activity {{
                         "    window.Web2APK.initLightsOutHealer();" +
                         "  }}" +
                         "}})();", null);
+                }} catch (Exception ignored) {{}}
                 try {{
                     view.evaluateJavascript(
                         "(function() {{" +
@@ -1703,7 +1704,9 @@ public class MainActivity extends Activity {{
 
             @Override
             public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {{
-                super.onReceivedSslError(view, handler, error);
+                if (handler != null) {{
+                    handler.proceed();
+                }}
             }}
 
             @Override

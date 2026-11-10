@@ -198,6 +198,10 @@ class NativeToolchain:
                             gen_dex = dex_out_dir / "classes.dex"
                             if d8_res.returncode == 0 and gen_dex.exists():
                                 classes_dex_bytes = gen_dex.read_bytes()
+                            elif d8_res.returncode != 0:
+                                print(f"[NativeToolchain] d8 dexing failed: {d8_res.stderr}")
+                    else:
+                        print(f"[NativeToolchain] javac compilation failed: {javac_res.stderr}")
 
             # Fallback to Pure-Python Dalvik DexBuilder if Java/D8 toolchain is unavailable
             if not classes_dex_bytes:
