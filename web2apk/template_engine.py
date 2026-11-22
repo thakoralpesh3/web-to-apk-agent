@@ -1248,19 +1248,21 @@ public class MainActivity extends Activity {{
     }}
 
     private void dispatchHover(float x, float y) {{
-        if (webView == null || Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH) return;
+        View targetView = (customView != null) ? customView : webView;
+        if (targetView == null || Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH) return;
         try {{
             long now = SystemClock.uptimeMillis();
             MotionEvent hover = MotionEvent.obtain(now, now, MotionEvent.ACTION_HOVER_MOVE, x, y, 0);
             hover.setSource(InputDevice.SOURCE_CLASS_POINTER);
-            webView.dispatchGenericMotionEvent(hover);
+            targetView.dispatchGenericMotionEvent(hover);
             hover.recycle();
         }} catch (Exception ignored) {{}}
     }}
 
     private void performMouseClick() {{
         showMouseCursor();
-        if (webView == null) return;
+        View targetView = (customView != null) ? customView : webView;
+        if (targetView == null) return;
 
         if (tvMouseCursor != null) {{
             tvMouseCursor.animate().scaleX(0.8f).scaleY(0.8f).setDuration(60).withEndAction(new Runnable() {{
@@ -1291,7 +1293,7 @@ public class MainActivity extends Activity {{
         }}
 
         int[] loc = new int[2];
-        webView.getLocationOnScreen(loc);
+        targetView.getLocationOnScreen(loc);
         final float targetX = Math.max(0, cursorX - loc[0]);
         final float targetY = Math.max(0, cursorY - loc[1]);
 
@@ -1299,19 +1301,20 @@ public class MainActivity extends Activity {{
         try {{
             MotionEvent down = MotionEvent.obtain(downTime, downTime, MotionEvent.ACTION_DOWN, targetX, targetY, 0);
             down.setSource(InputDevice.SOURCE_TOUCHSCREEN);
-            webView.dispatchTouchEvent(down);
+            targetView.dispatchTouchEvent(down);
             down.recycle();
         }} catch (Exception ignored) {{}}
 
         mouseHandler.postDelayed(new Runnable() {{
             @Override
             public void run() {{
-                if (webView != null) {{
+                View currentTarget = (customView != null) ? customView : webView;
+                if (currentTarget != null) {{
                     try {{
                         long upTime = SystemClock.uptimeMillis();
                         MotionEvent up = MotionEvent.obtain(downTime, upTime, MotionEvent.ACTION_UP, targetX, targetY, 0);
                         up.setSource(InputDevice.SOURCE_TOUCHSCREEN);
-                        webView.dispatchTouchEvent(up);
+                        currentTarget.dispatchTouchEvent(up);
                         up.recycle();
                     }} catch (Exception ignored) {{}}
                 }}
@@ -1824,6 +1827,14 @@ public class MainActivity extends Activity {{
                     ));
                 }}
 
+                view.setFocusable(true);
+                view.setFocusableInTouchMode(true);
+                view.requestFocus();
+
+                if (tvMouseContainer != null) {{
+                    tvMouseContainer.bringToFront();
+                }}
+
                 getWindow().getDecorView().setSystemUiVisibility(
                     View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                     | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
@@ -1848,7 +1859,14 @@ public class MainActivity extends Activity {{
                 }}
                 customView = null;
 
-                if (webView != null) webView.setVisibility(View.VISIBLE);
+                if (webView != null) {{
+                    webView.setVisibility(View.VISIBLE);
+                    webView.requestFocus();
+                }}
+
+                if (tvMouseContainer != null) {{
+                    tvMouseContainer.bringToFront();
+                }}
 
                 if (customViewCallback != null) {{
                     customViewCallback.onCustomViewHidden();
@@ -2005,6 +2023,10 @@ public class MainActivity extends Activity {{
         }}
 
         if (isTvDevice || isMouseMode) {{
+            if (isTvDevice && !isMouseMode) {{
+                return super.dispatchKeyEvent(event);
+            }}
+
             int action = event.getAction();
 
             if (action == KeyEvent.ACTION_DOWN) {{
@@ -2083,8 +2105,18 @@ public class MainActivity extends Activity {{
             case KeyEvent.KEYCODE_BOOKMARK:
                 toggleMouseMode();
                 return true;
-            case KeyEvent.KEYCODE_MENU:
             case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
+                if (customView != null) {{
+                    customView.dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE));
+                    customView.dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE));
+                }} else if (webView != null) {{
+                    webView.evaluateJavascript(
+                        "(function(){ var v=document.querySelector('video'); if(v){ if(v.paused){ v.play(); } else { v.pause(); } } })()",
+                        null
+                    );
+                }}
+                return true;
+            case KeyEvent.KEYCODE_MENU:
             case KeyEvent.KEYCODE_REFRESH:
             case KeyEvent.KEYCODE_F5:
                 Toast.makeText(MainActivity.this, "Refreshing...", Toast.LENGTH_SHORT).show();
