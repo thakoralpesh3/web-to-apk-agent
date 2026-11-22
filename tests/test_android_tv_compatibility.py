@@ -119,6 +119,29 @@ class TestAndroidTvCompatibility(unittest.TestCase):
         patched_html = (web_dir / "index.html").read_text(encoding="utf-8")
         self.assertIn("web2apk-tv-nav.js", patched_html)
 
+    def test_fullscreen_custom_view_interaction_and_media_keys(self):
+        activity_java = TemplateEngine._get_main_activity(
+            package_name="com.test.tvapp",
+            is_fullscreen=True,
+            remote_url=None,
+            is_tv=True,
+            theme_color="#0f172a"
+        )
+
+        # 1. onShowCustomView ensures focus and mouse cursor elevation
+        self.assertIn("view.setFocusable(true);", activity_java)
+        self.assertIn("view.requestFocus();", activity_java)
+
+        # 2. Clicks and hover events are dispatched to active target (customView if fullscreen)
+        self.assertIn("View targetView = (customView != null) ? customView : webView;", activity_java)
+        self.assertIn("targetView.dispatchTouchEvent(down);", activity_java)
+        self.assertIn("targetView.dispatchGenericMotionEvent(hover);", activity_java)
+
+        # 3. Media Play/Pause key forwards to customView or evaluates video play/pause JS
+        self.assertIn("KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:", activity_java)
+        self.assertIn("customView.dispatchKeyEvent", activity_java)
+        self.assertIn("v.paused", activity_java)
+
 
 if __name__ == "__main__":
     unittest.main()

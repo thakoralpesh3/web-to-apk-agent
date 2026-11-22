@@ -1293,7 +1293,11 @@ public class MainActivity extends Activity {{
         }}
 
         int[] loc = new int[2];
-        targetView.getLocationOnScreen(loc);
+        if (customView != null) {{
+            customView.getLocationOnScreen(loc);
+        }} else if (webView != null) {{
+            webView.getLocationOnScreen(loc);
+        }}
         final float targetX = Math.max(0, cursorX - loc[0]);
         final float targetY = Math.max(0, cursorY - loc[1]);
 
