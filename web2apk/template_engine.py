@@ -2111,7 +2111,7 @@ public class MainActivity extends Activity {{
                     customView.dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE));
                 }} else if (webView != null) {{
                     webView.evaluateJavascript(
-                        "(function(){ var v=document.querySelector('video'); if(v){ if(v.paused){ v.play(); } else { v.pause(); } } })()",
+                        "(function(){{ var v=document.querySelector('video'); if(v){{ if(v.paused){{ v.play(); }} else {{ v.pause(); }} }} }})()",
                         null
                     );
                 }}
