@@ -3186,6 +3186,7 @@ public class MainActivity extends Activity {{
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:8.2.2'
+        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22'
     }
 }
 
@@ -3212,6 +3213,7 @@ android.enableJetifier=true
 
         (app_path / "build.gradle").write_text(f"""plugins {{
     id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
 }}
 
 android {{
@@ -3240,10 +3242,16 @@ android {{
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }}
+
+    kotlinOptions {{
+        jvmTarget = '17'
+    }}
 }}
 
 dependencies {{
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.webkit:webkit:1.10.0'
+    implementation 'androidx.core:core-ktx:1.12.0'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.9.22'
 }}
 """, encoding="utf-8")
