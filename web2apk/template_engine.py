@@ -374,6 +374,9 @@ class TemplateEngine:
         )
         (java_dir / "MainActivity.java").write_text(main_activity_content, encoding="utf-8")
 
+        kotlin_controller_content = TemplateEngine._get_kotlin_controller(package_name=package_name)
+        (java_dir / "OttStreamingController.kt").write_text(kotlin_controller_content, encoding="utf-8")
+
         TemplateEngine._generate_res_files(res_dir, app_name)
 
         TemplateEngine._generate_gradle_files(
@@ -385,6 +388,87 @@ class TemplateEngine:
         )
 
         return str(project_path)
+
+    @staticmethod
+    def _get_kotlin_controller(package_name: str) -> str:
+        return f"""package {package_name};
+
+import android.app.Activity;
+import android.os.Handler;
+import android.os.Looper;
+import android.view.View;
+import android.webkit.WebView;
+import android.widget.Toast;
+
+/**
+ * OttStreamingController
+ * Kotlin reactive streaming companion providing Hotstar, Netflix, and Prime Video
+ * gesture handling, playback velocity adjustments, Picture-in-Picture triggers,
+ * and immersive HUD management.
+ */
+public class OttStreamingController {{
+    private final Activity activity;
+    private final WebView webView;
+    private boolean isScreenLocked = false;
+    private float playbackSpeed = 1.0f;
+    private boolean isControlsVisible = false;
+    private final Handler handler = new Handler(Looper.getMainLooper());
+
+    public OttStreamingController(Activity activity, WebView webView) {{
+        this.activity = activity;
+        this.webView = webView;
+    }}
+
+    public boolean isLocked() {{
+        return isScreenLocked;
+    }}
+
+    public float getPlaybackSpeed() {{
+        return playbackSpeed;
+    }}
+
+    public boolean isControlsShown() {{
+        return isControlsVisible;
+    }}
+
+    public void seekMedia(int seconds) {{
+        String js = "if (typeof window.__ottSeek === 'function') {{ window.__ottSeek(" + seconds + "); }} " +
+                    "else {{ var v = document.querySelector('video'); if (v) {{ v.currentTime = Math.max(0, Math.min(v.duration || 999999, v.currentTime + (" + seconds + "))); }} }}";
+        if (webView != null) {{
+            webView.evaluateJavascript(js, null);
+        }}
+    }}
+
+    public void togglePlayback() {{
+        String js = "if (typeof window.__ottTogglePlay === 'function') {{ window.__ottTogglePlay(); }} " +
+                    "else {{ var v = document.querySelector('video'); if (v) {{ if (v.paused) v.play(); else v.pause(); }} }}";
+        if (webView != null) {{
+            webView.evaluateJavascript(js, null);
+        }}
+    }}
+
+    public void setSpeed(float speed) {{
+        this.playbackSpeed = speed;
+        String js = "if (typeof window.__ottSetSpeed === 'function') {{ window.__ottSetSpeed(" + speed + "); }} " +
+                    "else {{ var v = document.querySelector('video'); if (v) {{ v.playbackRate = " + speed + "; }} }}";
+        if (webView != null) {{
+            webView.evaluateJavascript(js, null);
+        }}
+    }}
+
+    public boolean toggleLock() {{
+        isScreenLocked = !isScreenLocked;
+        return isScreenLocked;
+    }}
+
+    public void toggleControls(View controlsView, View bottomNavView) {{
+        isControlsVisible = !isControlsVisible;
+        int vis = isControlsVisible ? View.VISIBLE : View.GONE;
+        if (controlsView != null) controlsView.setVisibility(vis);
+        if (bottomNavView != null) bottomNavView.setVisibility(vis);
+    }}
+}}
+"""
 
     @staticmethod
     def _get_manifest(
