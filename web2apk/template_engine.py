@@ -578,6 +578,10 @@ import java.io.OutputStream;
 import android.media.MediaScannerConnection;
 import android.content.ContentValues;
 import android.provider.MediaStore;
+import android.app.PictureInPictureParams;
+import android.util.Rational;
+import android.content.res.Configuration;
+import android.app.UiModeManager;
 
 public class MainActivity extends Activity {{
 
@@ -1851,11 +1855,18 @@ public class MainActivity extends Activity {{
                 try {{
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
                 }} catch (Exception ignored) {{}}
+                try {{
+                    getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                }} catch (Exception ignored) {{}}
             }}
 
             @Override
             public void onHideCustomView() {{
                 if (customView == null) return;
+
+                try {{
+                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                }} catch (Exception ignored) {{}}
 
                 if (customViewContainer != null) {{
                     customViewContainer.removeView(customView);
