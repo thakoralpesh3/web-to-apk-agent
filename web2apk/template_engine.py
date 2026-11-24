@@ -2875,6 +2875,33 @@ public class MainActivity extends Activity {{
         android:color="#4438bdf8" />
 </shape>""", encoding="utf-8")
 
+        (drawable_dir / "ott_hud_bg.xml").write_text("""<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <corners android:radius="14dp" />
+    <solid android:color="#D90B0F19" />
+    <stroke android:width="1dp" android:color="#33FFFFFF" />
+</shape>""", encoding="utf-8")
+
+        (drawable_dir / "ott_nav_bg.xml").write_text("""<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <corners android:topLeftRadius="16dp" android:topRightRadius="16dp" />
+    <solid android:color="#F20F1014" />
+    <stroke android:width="1dp" android:color="#26FFFFFF" />
+</shape>""", encoding="utf-8")
+
+        (drawable_dir / "ott_btn_bg.xml").write_text("""<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <corners android:radius="8dp" />
+    <solid android:color="#26FFFFFF" />
+    <stroke android:width="1dp" android:color="#1AFFFFFF" />
+</shape>""", encoding="utf-8")
+
+        (drawable_dir / "ott_ripple_bg.xml").write_text("""<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="#66000000" />
+    <stroke android:width="2dp" android:color="#00E5FF" />
+</shape>""", encoding="utf-8")
+
         layout_dir = res_dir / "layout"
         layout_dir.mkdir(parents=True, exist_ok=True)
         (layout_dir / "activity_main.xml").write_text("""<?xml version="1.0" encoding="utf-8"?>
@@ -2902,6 +2929,217 @@ public class MainActivity extends Activity {{
         android:layout_height="4dp"
         android:layout_alignParentTop="true"
         android:visibility="gone" />
+
+    <!-- OTT Center HUD Badge (Brightness / Volume / Seek Status) -->
+    <TextView
+        android:id="@+id/ottHudBadge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:background="@drawable/ott_hud_bg"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:elevation="120dp"
+        android:visibility="gone" />
+
+    <!-- OTT Double-Tap Rewind Wave Ripple (Left) -->
+    <TextView
+        android:id="@+id/ottRippleLeft"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="28dp"
+        android:background="@drawable/ott_ripple_bg"
+        android:gravity="center"
+        android:text="⏪ 10s"
+        android:textColor="#FFFFFF"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:elevation="110dp"
+        android:visibility="gone" />
+
+    <!-- OTT Double-Tap Fast-Forward Wave Ripple (Right) -->
+    <TextView
+        android:id="@+id/ottRippleRight"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="28dp"
+        android:background="@drawable/ott_ripple_bg"
+        android:gravity="center"
+        android:text="10s ⏩"
+        android:textColor="#FFFFFF"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:elevation="110dp"
+        android:visibility="gone" />
+
+    <!-- OTT Lock Screen Indicator & Unlock Button -->
+    <Button
+        android:id="@+id/ottLockIndicator"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/ott_btn_bg"
+        android:text="🔒 Screen Locked (Tap to Unlock)"
+        android:textColor="#FFFFFF"
+        android:textSize="13sp"
+        android:elevation="150dp"
+        android:visibility="gone" />
+
+    <!-- OTT Floating Playback Controls Bar (Hotstar / Netflix style) -->
+    <LinearLayout
+        android:id="@+id/ottFloatingControls"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/ottBottomNav"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="12dp"
+        android:orientation="horizontal"
+        android:background="@drawable/ott_hud_bg"
+        android:padding="6dp"
+        android:elevation="105dp"
+        android:visibility="gone">
+
+        <Button
+            android:id="@+id/btnOttRewind"
+            android:layout_width="44dp"
+            android:layout_height="40dp"
+            android:text="⏪"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/ott_btn_bg" />
+
+        <Button
+            android:id="@+id/btnOttPlayPause"
+            android:layout_width="44dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="6dp"
+            android:text="⏯"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/ott_btn_bg" />
+
+        <Button
+            android:id="@+id/btnOttForward"
+            android:layout_width="44dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="6dp"
+            android:text="⏩"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/ott_btn_bg" />
+
+        <Button
+            android:id="@+id/btnOttSpeed"
+            android:layout_width="52dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="6dp"
+            android:text="1.0x"
+            android:textColor="#00E5FF"
+            android:textStyle="bold"
+            android:textSize="11sp"
+            android:background="@drawable/ott_btn_bg" />
+
+        <Button
+            android:id="@+id/btnOttPip"
+            android:layout_width="44dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="6dp"
+            android:text="⧉"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/ott_btn_bg" />
+
+        <Button
+            android:id="@+id/btnOttLock"
+            android:layout_width="44dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="6dp"
+            android:text="🔓"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/ott_btn_bg" />
+    </LinearLayout>
+
+    <!-- OTT Modern Bottom Navigation Bar (Hotstar / Netflix / Prime Video Style) -->
+    <LinearLayout
+        android:id="@+id/ottBottomNav"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/ott_nav_bg"
+        android:orientation="horizontal"
+        android:weightSum="5"
+        android:gravity="center_vertical"
+        android:elevation="100dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/navHome"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="🏠\nHome"
+            android:textColor="#00E5FF"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <TextView
+            android:id="@+id/navSearch"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="🔍\nSearch"
+            android:textColor="#94A3B8"
+            android:textSize="10sp"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <TextView
+            android:id="@+id/navWatchlist"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="⭐\nMy List"
+            android:textColor="#94A3B8"
+            android:textSize="10sp"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <TextView
+            android:id="@+id/navDownloads"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="⬇️\nDownloads"
+            android:textColor="#94A3B8"
+            android:textSize="10sp"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <TextView
+            android:id="@+id/navMore"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="⚙️\nMore"
+            android:textColor="#94A3B8"
+            android:textSize="10sp"
+            android:clickable="true"
+            android:focusable="true" />
+    </LinearLayout>
 
     <!-- Android TV Virtual Mouse Pointer Overlay -->
     <FrameLayout
