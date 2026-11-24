@@ -757,6 +757,56 @@ public class MainActivity extends Activity {{
         }}
 
         @JavascriptInterface
+        public void triggerPiP() {{
+            runOnUiThread(new Runnable() {{
+                @Override
+                public void run() {{
+                    triggerPictureInPicture();
+                }}
+            }});
+        }}
+
+        @JavascriptInterface
+        public void seekRelative(final int seconds) {{
+            runOnUiThread(new Runnable() {{
+                @Override
+                public void run() {{
+                    seekMedia(seconds);
+                }}
+            }});
+        }}
+
+        @JavascriptInterface
+        public void setPlaybackSpeed(final float speed) {{
+            runOnUiThread(new Runnable() {{
+                @Override
+                public void run() {{
+                    applyPlaybackSpeed(speed);
+                }}
+            }});
+        }}
+
+        @JavascriptInterface
+        public void toggleScreenLock() {{
+            runOnUiThread(new Runnable() {{
+                @Override
+                public void run() {{
+                    toggleLockState();
+                }}
+            }});
+        }}
+
+        @JavascriptInterface
+        public void setOttNavVisible(final boolean visible) {{
+            runOnUiThread(new Runnable() {{
+                @Override
+                public void run() {{
+                    if (visible) showOttControls(); else hideOttControls();
+                }}
+            }});
+        }}
+
+        @JavascriptInterface
         public void showToast(String message, boolean isLong) {{
             runOnUiThread(new Runnable() {{
                 @Override
@@ -1225,6 +1275,174 @@ public class MainActivity extends Activity {{
                 }}
             }} catch (Exception ignored) {{}}
             networkCallback = null;
+        }}
+    }}
+
+    // =========================================================================
+    // Hotstar / Netflix / Amazon Prime Interactive OTT Streaming Suite
+    // =========================================================================
+
+    private void setupOttControls() {{
+        if (ottFloatingControls != null) {{
+            Button btnPlay = findViewById(R.id.btnOttPlayPause);
+            if (btnPlay != null) btnPlay.setOnClickListener(new View.OnClickListener() {{
+                @Override public void onClick(View v) {{ toggleMediaPlayback(); }}
+            }});
+            Button btnRewind = findViewById(R.id.btnOttRewind);
+            if (btnRewind != null) btnRewind.setOnClickListener(new View.OnClickListener() {{
+                @Override public void onClick(View v) {{ seekMedia(-10); }}
+            }});
+            Button btnForward = findViewById(R.id.btnOttForward);
+            if (btnForward != null) btnForward.setOnClickListener(new View.OnClickListener() {{
+                @Override public void onClick(View v) {{ seekMedia(10); }}
+            }});
+            Button btnSpeed = findViewById(R.id.btnOttSpeed);
+            if (btnSpeed != null) btnSpeed.setOnClickListener(new View.OnClickListener() {{
+                @Override public void onClick(View v) {{ showSpeedSelector(); }}
+            }});
+            Button btnPip = findViewById(R.id.btnOttPip);
+            if (btnPip != null) btnPip.setOnClickListener(new View.OnClickListener() {{
+                @Override public void onClick(View v) {{ triggerPictureInPicture(); }}
+            }});
+            Button btnLock = findViewById(R.id.btnOttLock);
+            if (btnLock != null) btnLock.setOnClickListener(new View.OnClickListener() {{
+                @Override public void onClick(View v) {{ toggleLockState(); }}
+            }});
+        }}
+
+        if (ottLockIndicator != null) {{
+            ottLockIndicator.setOnClickListener(new View.OnClickListener() {{
+                @Override public void onClick(View v) {{ toggleLockState(); }}
+            }});
+        }}
+
+        if (ottBottomNav != null) {{
+            View navHome = findViewById(R.id.navHome);
+            if (navHome != null) navHome.setOnClickListener(new View.OnClickListener() {{
+                @Override public void onClick(View v) {{ if (webView != null) webView.loadUrl(TARGET_URL); }}
+            }});
+            View navSearch = findViewById(R.id.navSearch);
+            if (navSearch != null) navSearch.setOnClickListener(new View.OnClickListener() {{
+                @Override public void onClick(View v) {{
+                    if (webView != null) {{
+                        webView.evaluateJavascript("var el = document.querySelector('input[type=search], input[type=text], .search-box'); if (el) {{ el.focus(); el.scrollIntoView(); }} else {{ window.location.hash = '#search'; }}", null);
+                    }}
+                }}
+            }});
+            View navWatchlist = findViewById(R.id.navWatchlist);
+            if (navWatchlist != null) navWatchlist.setOnClickListener(new View.OnClickListener() {{
+                @Override public void onClick(View v) {{ showOttHud("⭐ Watchlist (My List)"); }}
+            }});
+            View navDownloads = findViewById(R.id.navDownloads);
+            if (navDownloads != null) navDownloads.setOnClickListener(new View.OnClickListener() {{
+                @Override public void onClick(View v) {{ showOttHud("⬇️ Offline Mode Active"); }}
+            }});
+            View navMore = findViewById(R.id.navMore);
+            if (navMore != null) navMore.setOnClickListener(new View.OnClickListener() {{
+                @Override public void onClick(View v) {{ showSpeedSelector(); }}
+            }});
+        }}
+    }}
+
+    private void showOttHud(String text) {{
+        if (ottHudBadge == null) return;
+        ottHudBadge.setText(text);
+        ottHudBadge.setVisibility(View.VISIBLE);
+        ottHandler.removeCallbacks(hideHudRunnable);
+        ottHandler.postDelayed(hideHudRunnable, 1400);
+    }}
+
+    private void showRippleBadge(final TextView badge) {{
+        if (badge == null) return;
+        badge.setVisibility(View.VISIBLE);
+        badge.setAlpha(1.0f);
+        badge.animate().alpha(0.0f).setDuration(650).withEndAction(new Runnable() {{
+            @Override public void run() {{ badge.setVisibility(View.GONE); }}
+        }}).start();
+    }}
+
+    private void toggleOttControls() {{
+        if (isOttControlsVisible) {{
+            hideOttControls();
+        }} else {{
+            showOttControls();
+        }}
+    }}
+
+    private void showOttControls() {{
+        if (ottFloatingControls != null) ottFloatingControls.setVisibility(View.VISIBLE);
+        if (ottBottomNav != null) ottBottomNav.setVisibility(View.VISIBLE);
+        isOttControlsVisible = true;
+        ottHandler.removeCallbacks(hideControlsRunnable);
+        ottHandler.postDelayed(hideControlsRunnable, 4500);
+    }}
+
+    private void hideOttControls() {{
+        if (ottFloatingControls != null) ottFloatingControls.setVisibility(View.GONE);
+        if (ottBottomNav != null) ottBottomNav.setVisibility(View.GONE);
+        isOttControlsVisible = false;
+    }}
+
+    private void seekMedia(int seconds) {{
+        showOttHud((seconds > 0 ? "⏩ +" : "⏪ ") + Math.abs(seconds) + "s");
+        String js = "if (typeof window.__ottSeek === 'function') {{ window.__ottSeek(" + seconds + "); }} " +
+                    "else {{ var v = document.querySelector('video'); if (v) {{ v.currentTime = Math.max(0, Math.min(v.duration || 999999, v.currentTime + (" + seconds + "))); }} }}";
+        if (webView != null) webView.evaluateJavascript(js, null);
+    }}
+
+    private void toggleMediaPlayback() {{
+        String js = "if (typeof window.__ottTogglePlay === 'function') {{ window.__ottTogglePlay(); }} " +
+                    "else {{ var v = document.querySelector('video'); if (v) {{ if (v.paused) v.play(); else v.pause(); }} }}";
+        if (webView != null) webView.evaluateJavascript(js, null);
+    }}
+
+    private void triggerPictureInPicture() {{
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {{
+            try {{
+                PictureInPictureParams.Builder pipBuilder = new PictureInPictureParams.Builder();
+                pipBuilder.setAspectRatio(new Rational(16, 9));
+                enterPictureInPictureMode(pipBuilder.build());
+            }} catch (Exception e) {{
+                Toast.makeText(this, "Picture-in-Picture active", Toast.LENGTH_SHORT).show();
+            }}
+        }} else {{
+            Toast.makeText(this, "PiP requires Android 8.0+", Toast.LENGTH_SHORT).show();
+        }}
+    }}
+
+    private void showSpeedSelector() {{
+        final String[] speeds = {{"0.5x", "0.75x", "Normal (1.0x)", "1.25x", "1.5x", "2.0x"}};
+        final float[] rates = {{0.5f, 0.75f, 1.0f, 1.25f, 1.5f, 2.0f}};
+        try {{
+            AlertDialog.Builder b = new AlertDialog.Builder(this, android.R.style.Theme_DeviceDefault_Dialog_Alert);
+            b.setTitle("Playback Speed (OTT Mode)");
+            b.setItems(speeds, new DialogInterface.OnClickListener() {{
+                @Override public void onClick(DialogInterface dialog, int which) {{
+                    applyPlaybackSpeed(rates[which]);
+                    Button btn = findViewById(R.id.btnOttSpeed);
+                    if (btn != null) btn.setText(speeds[which].replace("Normal ", ""));
+                }}
+            }});
+            b.show();
+        }} catch (Exception ignored) {{}}
+    }}
+
+    private void applyPlaybackSpeed(float speed) {{
+        currentPlaybackSpeed = speed;
+        String js = "if (typeof window.__ottSetSpeed === 'function') {{ window.__ottSetSpeed(" + speed + "); }} " +
+                    "else {{ var v = document.querySelector('video'); if (v) {{ v.playbackRate = " + speed + "; }} }}";
+        if (webView != null) webView.evaluateJavascript(js, null);
+        showOttHud("Speed: " + speed + "x");
+    }}
+
+    private void toggleLockState() {{
+        isScreenLocked = !isScreenLocked;
+        if (ottLockIndicator != null) {{
+            ottLockIndicator.setVisibility(isScreenLocked ? View.VISIBLE : View.GONE);
+        }}
+        showOttHud(isScreenLocked ? "🔒 Screen Locked" : "🔓 Screen Unlocked");
+        if (isScreenLocked) {{
+            hideOttControls();
         }}
     }}
 
