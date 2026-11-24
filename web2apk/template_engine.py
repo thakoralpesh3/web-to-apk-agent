@@ -2000,6 +2000,40 @@ public class MainActivity extends Activity {{
     }}
 
     @Override
+    public void onUserLeaveHint() {{
+        super.onUserLeaveHint();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {{
+            if (customView != null || (appInterface != null && appInterface.isLightsOutActive())) {{
+                try {{
+                    PictureInPictureParams.Builder pipBuilder = new PictureInPictureParams.Builder();
+                    if (customView != null && customView.getWidth() > 0 && customView.getHeight() > 0) {{
+                        int w = customView.getWidth();
+                        int h = customView.getHeight();
+                        Rational rational = new Rational(Math.max(1, w), Math.max(1, h));
+                        if (rational.floatValue() >= 0.41841f && rational.floatValue() <= 2.39f) {{
+                            pipBuilder.setAspectRatio(rational);
+                        }}
+                    }}
+                    enterPictureInPictureMode(pipBuilder.build());
+                }} catch (Throwable ignored) {{}}
+            }}
+        }}
+    }}
+
+    @Override
+    public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode, Configuration newConfig) {{
+        super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig);
+        if (isInPictureInPictureMode) {{
+            if (tvMouseContainer != null) tvMouseContainer.setVisibility(View.GONE);
+            if (progressBar != null) progressBar.setVisibility(View.GONE);
+        }} else {{
+            if (isTvDevice && tvMouseContainer != null) {{
+                tvMouseContainer.setVisibility(View.VISIBLE);
+            }}
+        }}
+    }}
+
+    @Override
     protected void onDestroy() {{
         unregisterNetworkCallback();
         if (customView != null && webChromeClient != null) {{
@@ -2035,6 +2069,18 @@ public class MainActivity extends Activity {{
                 handleBackPress();
             }}
             return true;
+        }}
+
+        if (event.getAction() == KeyEvent.ACTION_DOWN) {{
+            if (keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE || keyCode == KeyEvent.KEYCODE_MEDIA_PLAY || keyCode == KeyEvent.KEYCODE_MEDIA_PAUSE) {{
+                if (webView != null) {{
+                    webView.evaluateJavascript(
+                        "(function() {{ var v = document.querySelector('video'); if (v) {{ if (v.paused) v.play(); else v.pause(); }} }})()",
+                        null
+                    );
+                    return true;
+                }}
+            }}
         }}
 
         if (isTvDevice || isMouseMode) {{
