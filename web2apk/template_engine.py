@@ -666,6 +666,12 @@ import android.app.PictureInPictureParams;
 import android.util.Rational;
 import android.content.res.Configuration;
 import android.app.UiModeManager;
+import android.media.AudioManager;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.LinearLayout;
 
 public class MainActivity extends Activity {{
 
@@ -702,6 +708,36 @@ public class MainActivity extends Activity {{
     private Handler mouseHandler = new Handler(Looper.getMainLooper());
     private boolean isTvDevice = false;
     private boolean cursorPositionInitialized = false;
+    // Hotstar, Netflix & Prime Video Interactive OTT Streaming Suite
+    private TextView ottHudBadge;
+    private TextView ottRippleLeft;
+    private TextView ottRippleRight;
+    private Button ottLockIndicator;
+    private LinearLayout ottFloatingControls;
+    private LinearLayout ottBottomNav;
+    private boolean isScreenLocked = false;
+    private boolean isOttControlsVisible = false;
+    private AudioManager audioManager;
+    private int maxVolume = 15;
+    private float touchDownBrightness = -1f;
+    private int touchDownVolume = -1;
+    private long lastTapTime = 0;
+    private static final long DOUBLE_TAP_TIMEOUT = 300;
+    private float currentPlaybackSpeed = 1.0f;
+    private Handler ottHandler = new Handler(Looper.getMainLooper());
+    private Runnable hideHudRunnable = new Runnable() {{
+        @Override
+        public void run() {{
+            if (ottHudBadge != null) ottHudBadge.setVisibility(View.GONE);
+        }}
+    }};
+    private Runnable hideControlsRunnable = new Runnable() {{
+        @Override
+        public void run() {{
+            hideOttControls();
+        }}
+    }};
+
     private WebAppInterface appInterface;
     private long lastBackPressTime = 0;
     private static final long BACK_PRESS_INTERVAL = 2000;
