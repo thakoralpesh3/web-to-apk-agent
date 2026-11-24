@@ -1967,12 +1967,23 @@ public class MainActivity extends Activity {{
     @Override
     protected void onUserLeaveHint() {{
         super.onUserLeaveHint();
-        if (customView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {{
-            try {{
-                if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)) {{
-                    enterPictureInPictureMode();
-                }}
-            }} catch (Exception ignored) {{}}
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {{
+            if (customView != null || (appInterface != null && appInterface.isLightsOutActive())) {{
+                try {{
+                    if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)) {{
+                        PictureInPictureParams.Builder pipBuilder = new PictureInPictureParams.Builder();
+                        if (customView != null && customView.getWidth() > 0 && customView.getHeight() > 0) {{
+                            int w = customView.getWidth();
+                            int h = customView.getHeight();
+                            Rational rational = new Rational(Math.max(1, w), Math.max(1, h));
+                            if (rational.floatValue() >= 0.41841f && rational.floatValue() <= 2.39f) {{
+                                pipBuilder.setAspectRatio(rational);
+                            }}
+                        }}
+                        enterPictureInPictureMode(pipBuilder.build());
+                    }}
+                }} catch (Throwable ignored) {{}}
+            }}
         }}
     }}
 
@@ -1996,27 +2007,6 @@ public class MainActivity extends Activity {{
         if (webView != null) {{
             webView.onResume();
             webView.resumeTimers();
-        }}
-    }}
-
-    @Override
-    public void onUserLeaveHint() {{
-        super.onUserLeaveHint();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {{
-            if (customView != null || (appInterface != null && appInterface.isLightsOutActive())) {{
-                try {{
-                    PictureInPictureParams.Builder pipBuilder = new PictureInPictureParams.Builder();
-                    if (customView != null && customView.getWidth() > 0 && customView.getHeight() > 0) {{
-                        int w = customView.getWidth();
-                        int h = customView.getHeight();
-                        Rational rational = new Rational(Math.max(1, w), Math.max(1, h));
-                        if (rational.floatValue() >= 0.41841f && rational.floatValue() <= 2.39f) {{
-                            pipBuilder.setAspectRatio(rational);
-                        }}
-                    }}
-                    enterPictureInPictureMode(pipBuilder.build());
-                }} catch (Throwable ignored) {{}}
-            }}
         }}
     }}
 
