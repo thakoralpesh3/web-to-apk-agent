@@ -1688,6 +1688,22 @@ public class MainActivity extends Activity {{
         customViewContainer = findViewById(R.id.customViewContainer);
         originalOrientation = getRequestedOrientation();
 
+        ottHudBadge = findViewById(R.id.ottHudBadge);
+        ottRippleLeft = findViewById(R.id.ottRippleLeft);
+        ottRippleRight = findViewById(R.id.ottRippleRight);
+        ottLockIndicator = findViewById(R.id.ottLockIndicator);
+        ottFloatingControls = findViewById(R.id.ottFloatingControls);
+        ottBottomNav = findViewById(R.id.ottBottomNav);
+
+        try {{
+            audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+            if (audioManager != null) {{
+                maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+            }}
+        }} catch (Exception ignored) {{}}
+
+        setupOttControls();
+
         {fullscreen_code}
 
         WebSettings webSettings = webView.getSettings();
@@ -1762,6 +1778,24 @@ public class MainActivity extends Activity {{
         webView.setOnTouchListener(new View.OnTouchListener() {{
             @Override
             public boolean onTouch(View v, MotionEvent event) {{
+                if (isScreenLocked) {{
+                    if (event.getAction() == MotionEvent.ACTION_DOWN) {{
+                        if (ottLockIndicator != null) {{
+                            ottLockIndicator.setVisibility(View.VISIBLE);
+                            ottHandler.removeCallbacks(hideHudRunnable);
+                            ottHandler.postDelayed(new Runnable() {{
+                                @Override
+                                public void run() {{
+                                    if (ottLockIndicator != null && isScreenLocked) {{
+                                        ottLockIndicator.setVisibility(View.GONE);
+                                    }}
+                                }}
+                            }}, 2000);
+                        }}
+                    }}
+                    return true;
+                }}
+
                 switch (event.getAction()) {{
                     case MotionEvent.ACTION_DOWN:
                         touchDownY = event.getY();
@@ -1770,17 +1804,73 @@ public class MainActivity extends Activity {{
                         if (!isTvDevice && isMouseMode) {{
                             hideMouseCursor();
                         }}
+
+                        try {{
+                            if (audioManager != null) {{
+                                touchDownVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+                            }}
+                            WindowManager.LayoutParams lp = getWindow().getAttributes();
+                            touchDownBrightness = lp.screenBrightness >= 0 ? lp.screenBrightness : 0.5f;
+                        }} catch (Exception ignored) {{}}
+
+                        // Double tap detection for Hotstar/Netflix/Prime 10s seek
+                        long now = System.currentTimeMillis();
+                        if (now - lastTapTime < DOUBLE_TAP_TIMEOUT) {{
+                            float w = v.getWidth() > 0 ? (float) v.getWidth() : 1080f;
+                            if (touchDownX < w * 0.38f) {{
+                                seekMedia(-10);
+                                showRippleBadge(ottRippleLeft);
+                                lastTapTime = 0;
+                                return true;
+                            }} else if (touchDownX > w * 0.62f) {{
+                                seekMedia(10);
+                                showRippleBadge(ottRippleRight);
+                                lastTapTime = 0;
+                                return true;
+                            }}
+                        }}
+                        lastTapTime = now;
                         break;
+
                     case MotionEvent.ACTION_MOVE:
-                        if (webView != null && webView.getScrollY() > 0) {{
-                            touchDownY = event.getY();
-                            touchDownX = event.getX();
-                        }} else if (webView != null && webView.getScrollY() <= 0) {{
-                            float deltaY = event.getY() - touchDownY;
-                            float deltaX = Math.abs(event.getX() - touchDownX);
-                            float density = getResources().getDisplayMetrics().density;
-                            float pullThreshold = Math.max(120f, density * 75f);
-                            if (deltaY > pullThreshold && deltaY > deltaX * 1.5f && !isPullRefreshing) {{
+                        float deltaY = touchDownY - event.getY();
+                        float deltaX = event.getX() - touchDownX;
+                        float absDeltaY = Math.abs(deltaY);
+                        float absDeltaX = Math.abs(deltaX);
+                        float viewH = v.getHeight() > 0 ? (float) v.getHeight() : 1920f;
+                        float viewW = v.getWidth() > 0 ? (float) v.getWidth() : 1080f;
+
+                        // Vertical Swipe Gestures for Brightness (left) & Volume (right)
+                        if (absDeltaY > 45f && absDeltaY > absDeltaX * 1.6f) {{
+                            if (touchDownX < viewW * 0.45f) {{
+                                // Left half: Brightness
+                                try {{
+                                    WindowManager.LayoutParams lp = getWindow().getAttributes();
+                                    float newB = Math.max(0.02f, Math.min(1.0f, touchDownBrightness + (deltaY / (viewH * 0.75f))));
+                                    lp.screenBrightness = newB;
+                                    getWindow().setAttributes(lp);
+                                    showOttHud("☀️ Brightness: " + (int)(newB * 100) + "%");
+                                }} catch (Exception ignored) {{}}
+                                return true;
+                            }} else if (touchDownX > viewW * 0.55f) {{
+                                // Right half: Volume
+                                try {{
+                                    if (audioManager != null && maxVolume > 0) {{
+                                        int volDiff = (int)((deltaY / (viewH * 0.75f)) * maxVolume);
+                                        int newV = Math.max(0, Math.min(maxVolume, touchDownVolume + volDiff));
+                                        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, newV, 0);
+                                        int pct = (int)(((float) newV / maxVolume) * 100);
+                                        showOttHud("🔊 Volume: " + pct + "%");
+                                    }}
+                                }} catch (Exception ignored) {{}}
+                                return true;
+                            }}
+                        }}
+
+                        // Pull-to-refresh fallback on top of scroll
+                        if (webView != null && webView.getScrollY() <= 0) {{
+                            float pullThreshold = Math.max(120f, getResources().getDisplayMetrics().density * 75f);
+                            if (event.getY() - touchDownY > pullThreshold && (event.getY() - touchDownY) > absDeltaX * 1.5f && !isPullRefreshing) {{
                                 isPullRefreshing = true;
                                 Toast.makeText(MainActivity.this, "Refreshing...", Toast.LENGTH_SHORT).show();
                                 refreshPage();
@@ -1793,9 +1883,16 @@ public class MainActivity extends Activity {{
                             }}
                         }}
                         break;
+
                     case MotionEvent.ACTION_UP:
                     case MotionEvent.ACTION_CANCEL:
                         isPullRefreshing = false;
+                        float upDeltaX = Math.abs(event.getX() - touchDownX);
+                        float upDeltaY = Math.abs(event.getY() - touchDownY);
+                        // Single tap toggle controls
+                        if (upDeltaX < 20f && upDeltaY < 20f && (System.currentTimeMillis() - lastTapTime < 250)) {{
+                            toggleOttControls();
+                        }}
                         break;
                 }}
                 return false;
