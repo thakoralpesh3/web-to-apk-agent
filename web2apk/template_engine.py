@@ -2107,6 +2107,31 @@ public class MainActivity extends Activity {{
                         "  }} catch(e) {{}}" +
                         "}})();", null);
                 }} catch (Exception ignored) {{}}
+                try {{
+                    view.evaluateJavascript(
+                        "(function() {{" +
+                        "  if (window.__ott_hooked) return;" +
+                        "  window.__ott_hooked = true;" +
+                        "  window.__ottSeek = function(sec) {{" +
+                        "    var v = document.querySelector('video');" +
+                        "    if (v) {{ v.currentTime = Math.max(0, Math.min(v.duration || 999999, v.currentTime + sec)); }}" +
+                        "  }};" +
+                        "  window.__ottSetSpeed = function(rate) {{" +
+                        "    var v = document.querySelector('video');" +
+                        "    if (v) {{ v.playbackRate = rate; }}" +
+                        "  }};" +
+                        "  window.__ottTogglePlay = function() {{" +
+                        "    var v = document.querySelector('video');" +
+                        "    if (v) {{ if (v.paused) v.play(); else v.pause(); }}" +
+                        "  }};" +
+                        "  window.OTTPlayer = {{" +
+                        "    seek: window.__ottSeek," +
+                        "    setSpeed: window.__ottSetSpeed," +
+                        "    togglePlay: window.__ottTogglePlay," +
+                        "    triggerPiP: function() {{ if (window.AndroidApp && window.AndroidApp.triggerPiP) window.AndroidApp.triggerPiP(); }}" +
+                        "  }};" +
+                        "}})();", null);
+                }} catch (Exception ignored) {{}}
                 super.onPageFinished(view, url);
             }}
 
