@@ -379,7 +379,7 @@ def main():
     parser.add_argument("--permissions", type=str, default=None, help="Comma-separated Android permissions")
     parser.add_argument("--tv", action="store_true", default=True, help="Enable Android TV & D-Pad navigation")
     parser.add_argument("--no-tv", dest="tv", action="store_false", help="Disable Android TV support")
-    parser.add_argument("--target", "--device", type=str, choices=["smartphone", "tv"], default=None, help="Target device platform: smartphone or tv (default: smartphone)")
+    parser.add_argument("--target", "--device", type=str, choices=["smartphone", "tv", "both"], default=None, help="Target device platform: smartphone, tv, or both (default: smartphone)")
     parser.add_argument("--fullscreen", action="store_true", default=True, help="Enable immersive fullscreen")
     parser.add_argument("--icon", type=str, default=None, help="Path to custom application icon")
     parser.add_argument("--no-serve", dest="serve", action="store_false", default=True, help="Do not start Wi-Fi sideload server after build")
@@ -544,7 +544,7 @@ def main():
         chosen_target = args.target
         if not chosen_target:
             chosen_target = "tv" if (args.tv and "--tv" in sys.argv) else "smartphone"
-        effective_tv = (chosen_target == "tv")
+        effective_tv = (chosen_target in ["tv", "both"])
 
         console.print(f"  • [bold white]Target Platform:[/bold white] [bold cyan]{chosen_target.capitalize()}[/bold cyan]")
         console.print(f"  • [bold white]Permissions ({len(final_perms)}):[/bold white] [dim]{', '.join([p.replace('android.permission.', '') for p in final_perms])}[/dim]\n")
