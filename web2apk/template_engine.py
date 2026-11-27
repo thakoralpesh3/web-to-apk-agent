@@ -1902,8 +1902,8 @@ public class MainActivity extends Activity {{
             }}
         }};
         webView.setOnTouchListener(ottTouchListener);
-        if (fullscreenContainer != null) {{
-            fullscreenContainer.setOnTouchListener(ottTouchListener);
+        if (customViewContainer != null) {{
+            customViewContainer.setOnTouchListener(ottTouchListener);
         }}
 
         webView.setDownloadListener(new DownloadListener() {{
