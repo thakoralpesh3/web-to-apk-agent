@@ -67,3 +67,13 @@ class TestOttInteractivity(unittest.TestCase):
         self.assertIn("applyPlaybackSpeed", activity_java)
         self.assertIn("DOUBLE_TAP_TIMEOUT", activity_java)
         self.assertIn("triggerPiP", activity_java)
+
+        # 6. Verify OTT swipe/tap gestures only intercept during fullscreen video (preserving normal webpage scroll)
+        self.assertIn("boolean isFullscreenVideo = (customView != null);", activity_java)
+        self.assertIn("fullscreenContainer.setOnTouchListener(ottTouchListener);", activity_java)
+
+        # 7. Verify DownloadListener handles non-HTML extensions, Referer, and avoids saving raw text/html
+        self.assertIn('request.addRequestHeader("Referer", pageReferer);', activity_java)
+        self.assertIn('urlLower.contains(".apk")', activity_java)
+        self.assertIn('urlLower.contains(".mp4")', activity_java)
+        self.assertIn('Intent.ACTION_VIEW', activity_java)
