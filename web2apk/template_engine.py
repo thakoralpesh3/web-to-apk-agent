@@ -1944,16 +1944,34 @@ public class MainActivity extends Activity {{
                         fileName = URLUtil.guessFileName(url, contentDisposition, mimetype);
                     }}
                     String urlLower = url.toLowerCase();
-                    if (fileName.endsWith(".html") || fileName.endsWith(".bin") || !fileName.contains(".")) {{
-                        if (urlLower.contains(".sqlite3")) fileName = fileName.replaceAll("\\\\.[^.]+$", "") + ".sqlite3";
-                        else if (urlLower.contains(".sqlite")) fileName = fileName.replaceAll("\\\\.[^.]+$", "") + ".sqlite";
-                        else if (urlLower.contains(".db3")) fileName = fileName.replaceAll("\\\\.[^.]+$", "") + ".db3";
-                        else if (urlLower.contains(".db")) fileName = fileName.replaceAll("\\\\.[^.]+$", "") + ".db";
-                        else if (urlLower.contains(".sql")) fileName = fileName.replaceAll("\\\\.[^.]+$", "") + ".sql";
-                        else if (urlLower.contains(".json")) fileName = fileName.replaceAll("\\\\.[^.]+$", "") + ".json";
-                        else if (urlLower.contains(".csv")) fileName = fileName.replaceAll("\\\\.[^.]+$", "") + ".csv";
-                        else if (urlLower.contains(".xlsx")) fileName = fileName.replaceAll("\\\\.[^.]+$", "") + ".xlsx";
-                        else if (urlLower.contains(".zip")) fileName = fileName.replaceAll("\\\\.[^.]+$", "") + ".zip";
+                    String mimeLower = (mimetype != null) ? mimetype.toLowerCase() : "";
+                    if (fileName.endsWith(".html") || fileName.endsWith(".htm") || fileName.endsWith(".bin") || !fileName.contains(".")) {{
+                        String baseName = fileName.replaceAll("\\\\.[^.]+$", "");
+                        if (urlLower.contains(".apk") || mimeLower.contains("android.package-archive")) fileName = baseName + ".apk";
+                        else if (urlLower.contains(".mp4") || mimeLower.equals("video/mp4")) fileName = baseName + ".mp4";
+                        else if (urlLower.contains(".mkv")) fileName = baseName + ".mkv";
+                        else if (urlLower.contains(".webm") || mimeLower.equals("video/webm")) fileName = baseName + ".webm";
+                        else if (urlLower.contains(".mp3") || mimeLower.equals("audio/mpeg")) fileName = baseName + ".mp3";
+                        else if (urlLower.contains(".m4a")) fileName = baseName + ".m4a";
+                        else if (urlLower.contains(".pdf") || mimeLower.equals("application/pdf")) fileName = baseName + ".pdf";
+                        else if (urlLower.contains(".sqlite3")) fileName = baseName + ".sqlite3";
+                        else if (urlLower.contains(".sqlite")) fileName = baseName + ".sqlite";
+                        else if (urlLower.contains(".db3")) fileName = baseName + ".db3";
+                        else if (urlLower.contains(".db")) fileName = baseName + ".db";
+                        else if (urlLower.contains(".sql")) fileName = baseName + ".sql";
+                        else if (urlLower.contains(".json")) fileName = baseName + ".json";
+                        else if (urlLower.contains(".csv")) fileName = baseName + ".csv";
+                        else if (urlLower.contains(".xlsx")) fileName = baseName + ".xlsx";
+                        else if (urlLower.contains(".zip") || mimeLower.equals("application/zip")) fileName = baseName + ".zip";
+                        else if (urlLower.contains(".rar")) fileName = baseName + ".rar";
+                        else if (urlLower.contains(".7z")) fileName = baseName + ".7z";
+                    }}
+                    // If server only returned an HTML page (e.g. interstitial/redirect), open in browser instead of saving .html
+                    if ((fileName.endsWith(".html") || fileName.endsWith(".htm")) &&
+                        (mimeLower.isEmpty() || mimeLower.contains("text/html"))) {{
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                        startActivity(browserIntent);
+                        return;
                     }}
                     DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
                     if (mimetype != null && !mimetype.isEmpty()) {{
@@ -1962,6 +1980,10 @@ public class MainActivity extends Activity {{
                     String cookies = CookieManager.getInstance().getCookie(url);
                     if (cookies != null) {{
                         request.addRequestHeader("cookie", cookies);
+                    }}
+                    String pageReferer = (webView != null) ? webView.getUrl() : null;
+                    if (pageReferer != null && !pageReferer.isEmpty()) {{
+                        request.addRequestHeader("Referer", pageReferer);
                     }}
                     if (userAgent != null) {{
                         request.addRequestHeader("User-Agent", userAgent);
