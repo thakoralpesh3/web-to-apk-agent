@@ -133,6 +133,14 @@ class URLExtractor:
 
         for cand_url in candidate_urls:
             try:
+                if cand_url.startswith("data:"):
+                    from .icon_generator import IconGenerator
+                    img = IconGenerator.load_and_normalize_image(cand_url, 512, domain)
+                    if img:
+                        img.save(dest_path, "PNG")
+                        return dest_path
+                    continue
+
                 cand_safe, _ = SSRFProtector.is_url_safe(cand_url)
                 if not cand_safe:
                     continue
