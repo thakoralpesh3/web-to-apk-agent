@@ -2106,7 +2106,7 @@ public class MainActivity extends Activity {{
                         "      return true;" +
                         "    }} else if (u.indexOf('data:') === 0) {{" +
                         "      if (window.AndroidApp && window.AndroidApp.saveBase64File) {{ window.AndroidApp.saveBase64File(u, name || 'database.sqlite', ''); return true; }}" +
-                        "    }} else if (isDb(u, name) || name) {{" +
+                        "    }} else if (isDb(u, name)) {{" +
                         "      if (window.AndroidApp && window.AndroidApp.downloadUrlWithFilename) {{ window.AndroidApp.downloadUrlWithFilename(u, name || '', ''); return true; }}" +
                         "    }}" +
                         "    return false;" +
@@ -2115,7 +2115,7 @@ public class MainActivity extends Activity {{
                         "    var t = e.target;" +
                         "    while (t && t.tagName !== 'A') t = t.parentElement;" +
                         "    if (!t || t.tagName !== 'A') return;" +
-                        "    var h = t.getAttribute('href') || t.href || '';" +
+                        "    var h = t.href || t.getAttribute('href') || '';" +
                         "    var d = t.getAttribute('download');" +
                         "    var fn = d || t.download || '';" +
                         "    if (d !== null || h.indexOf('blob:') === 0 || h.indexOf('data:') === 0 || isDb(h, fn)) {{" +
@@ -2125,7 +2125,7 @@ public class MainActivity extends Activity {{
                         "  try {{" +
                         "    var origClick = HTMLAnchorElement.prototype.click;" +
                         "    HTMLAnchorElement.prototype.click = function() {{" +
-                        "      var h = this.getAttribute('href') || this.href || '';" +
+                        "      var h = this.href || this.getAttribute('href') || '';" +
                         "      var d = this.getAttribute('download');" +
                         "      var fn = d || this.download || '';" +
                         "      if (d !== null || h.indexOf('blob:') === 0 || h.indexOf('data:') === 0 || isDb(h, fn)) {{" +
