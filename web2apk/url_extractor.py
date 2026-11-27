@@ -103,6 +103,13 @@ class URLExtractor:
             for im in icon_matches:
                 candidate_urls.append(urllib.parse.urljoin(url, im))
 
+            # D2. Inline <svg> logo inside logo/brand container or svg element
+            svg_logo_match = re.search(r'<(?:div|a|span)[^>]+(?:class|id)=["\'][^"\']*(?:logo|brand)[^"\']*["\'][^>]*>.*?(<svg[^>]*>.*?</svg>)', html, re.IGNORECASE | re.DOTALL)
+            if not svg_logo_match:
+                svg_logo_match = re.search(r'(<svg[^>]+(?:class|id|aria-label)=["\'][^"\']*(?:logo|brand)[^"\']*["\'][^>]*>.*?</svg>)', html, re.IGNORECASE | re.DOTALL)
+            if svg_logo_match:
+                candidate_urls.append("data:image/svg+xml;utf8," + urllib.parse.quote(svg_logo_match.group(1)))
+
         except Exception as e:
             print(f"[URLExtractor] Warning inspecting {url}: {e}")
 
