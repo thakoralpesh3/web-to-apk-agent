@@ -1775,7 +1775,7 @@ public class MainActivity extends Activity {{
             initVirtualMouse();
         }} catch (Throwable ignored) {{}}
 
-        webView.setOnTouchListener(new View.OnTouchListener() {{
+        View.OnTouchListener ottTouchListener = new View.OnTouchListener() {{
             @Override
             public boolean onTouch(View v, MotionEvent event) {{
                 if (isScreenLocked) {{
@@ -1796,6 +1796,8 @@ public class MainActivity extends Activity {{
                     return true;
                 }}
 
+                boolean isFullscreenVideo = (customView != null);
+
                 switch (event.getAction()) {{
                     case MotionEvent.ACTION_DOWN:
                         touchDownY = event.getY();
@@ -1805,31 +1807,33 @@ public class MainActivity extends Activity {{
                             hideMouseCursor();
                         }}
 
-                        try {{
-                            if (audioManager != null) {{
-                                touchDownVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-                            }}
-                            WindowManager.LayoutParams lp = getWindow().getAttributes();
-                            touchDownBrightness = lp.screenBrightness >= 0 ? lp.screenBrightness : 0.5f;
-                        }} catch (Exception ignored) {{}}
+                        if (isFullscreenVideo) {{
+                            try {{
+                                if (audioManager != null) {{
+                                    touchDownVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+                                }}
+                                WindowManager.LayoutParams lp = getWindow().getAttributes();
+                                touchDownBrightness = lp.screenBrightness >= 0 ? lp.screenBrightness : 0.5f;
+                            }} catch (Exception ignored) {{}}
 
-                        // Double tap detection for Hotstar/Netflix/Prime 10s seek
-                        long now = System.currentTimeMillis();
-                        if (now - lastTapTime < DOUBLE_TAP_TIMEOUT) {{
-                            float w = v.getWidth() > 0 ? (float) v.getWidth() : 1080f;
-                            if (touchDownX < w * 0.38f) {{
-                                seekMedia(-10);
-                                showRippleBadge(ottRippleLeft);
-                                lastTapTime = 0;
-                                return true;
-                            }} else if (touchDownX > w * 0.62f) {{
-                                seekMedia(10);
-                                showRippleBadge(ottRippleRight);
-                                lastTapTime = 0;
-                                return true;
+                            // Double tap detection for Hotstar/Netflix/Prime 10s seek in fullscreen player
+                            long now = System.currentTimeMillis();
+                            if (now - lastTapTime < DOUBLE_TAP_TIMEOUT) {{
+                                float w = v.getWidth() > 0 ? (float) v.getWidth() : 1080f;
+                                if (touchDownX < w * 0.38f) {{
+                                    seekMedia(-10);
+                                    showRippleBadge(ottRippleLeft);
+                                    lastTapTime = 0;
+                                    return true;
+                                }} else if (touchDownX > w * 0.62f) {{
+                                    seekMedia(10);
+                                    showRippleBadge(ottRippleRight);
+                                    lastTapTime = 0;
+                                    return true;
+                                }}
                             }}
+                            lastTapTime = now;
                         }}
-                        lastTapTime = now;
                         break;
 
                     case MotionEvent.ACTION_MOVE:
@@ -1837,13 +1841,12 @@ public class MainActivity extends Activity {{
                         float deltaX = event.getX() - touchDownX;
                         float absDeltaY = Math.abs(deltaY);
                         float absDeltaX = Math.abs(deltaX);
-                        float viewH = v.getHeight() > 0 ? (float) v.getHeight() : 1920f;
-                        float viewW = v.getWidth() > 0 ? (float) v.getWidth() : 1080f;
 
-                        // Vertical Swipe Gestures for Brightness (left) & Volume (right)
-                        if (absDeltaY > 45f && absDeltaY > absDeltaX * 1.6f) {{
+                        // Vertical Swipe Gestures for Brightness (left) & Volume (right) ONLY in fullscreen video mode
+                        if (isFullscreenVideo && absDeltaY > 45f && absDeltaY > absDeltaX * 1.6f) {{
+                            float viewH = v.getHeight() > 0 ? (float) v.getHeight() : 1920f;
+                            float viewW = v.getWidth() > 0 ? (float) v.getWidth() : 1080f;
                             if (touchDownX < viewW * 0.45f) {{
-                                // Left half: Brightness
                                 try {{
                                     WindowManager.LayoutParams lp = getWindow().getAttributes();
                                     float newB = Math.max(0.02f, Math.min(1.0f, touchDownBrightness + (deltaY / (viewH * 0.75f))));
@@ -1853,7 +1856,6 @@ public class MainActivity extends Activity {{
                                 }} catch (Exception ignored) {{}}
                                 return true;
                             }} else if (touchDownX > viewW * 0.55f) {{
-                                // Right half: Volume
                                 try {{
                                     if (audioManager != null && maxVolume > 0) {{
                                         int volDiff = (int)((deltaY / (viewH * 0.75f)) * maxVolume);
@@ -1867,8 +1869,8 @@ public class MainActivity extends Activity {{
                             }}
                         }}
 
-                        // Pull-to-refresh fallback on top of scroll
-                        if (webView != null && webView.getScrollY() <= 0) {{
+                        // Pull-to-refresh fallback on top of scroll (normal browsing only)
+                        if (!isFullscreenVideo && webView != null && webView.getScrollY() <= 0) {{
                             float pullThreshold = Math.max(120f, getResources().getDisplayMetrics().density * 75f);
                             if (event.getY() - touchDownY > pullThreshold && (event.getY() - touchDownY) > absDeltaX * 1.5f && !isPullRefreshing) {{
                                 isPullRefreshing = true;
@@ -1887,17 +1889,22 @@ public class MainActivity extends Activity {{
                     case MotionEvent.ACTION_UP:
                     case MotionEvent.ACTION_CANCEL:
                         isPullRefreshing = false;
-                        float upDeltaX = Math.abs(event.getX() - touchDownX);
-                        float upDeltaY = Math.abs(event.getY() - touchDownY);
-                        // Single tap toggle controls
-                        if (upDeltaX < 20f && upDeltaY < 20f && (System.currentTimeMillis() - lastTapTime < 250)) {{
-                            toggleOttControls();
+                        if (isFullscreenVideo) {{
+                            float upDeltaX = Math.abs(event.getX() - touchDownX);
+                            float upDeltaY = Math.abs(event.getY() - touchDownY);
+                            if (upDeltaX < 20f && upDeltaY < 20f && (System.currentTimeMillis() - lastTapTime < 250)) {{
+                                toggleOttControls();
+                            }}
                         }}
                         break;
                 }}
                 return false;
             }}
-        }});
+        }};
+        webView.setOnTouchListener(ottTouchListener);
+        if (fullscreenContainer != null) {{
+            fullscreenContainer.setOnTouchListener(ottTouchListener);
+        }}
 
         webView.setDownloadListener(new DownloadListener() {{
             @Override
